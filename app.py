@@ -16,19 +16,19 @@ conn = pymysql.connect(host='localhost',
 #Define a route to hello function
 @app.route('/')
 def hello():
-	return render_template('Index.html')
+	return render_template('index.html')
 
 #Define route for customer login
 @app.route('/login')
 def login():
-	return render_template('login.html')
+	return render_template('Customer-Registration.html')
 
 #Define route for register
 @app.route('/Customer-Registration')
-def register():
+def customer_register():
 	return render_template('Customer-Registration.html')
 
-'''
+
 #Authenticates the login
 @app.route('/loginAuth', methods=['GET', 'POST'])
 def loginAuth():
@@ -112,7 +112,7 @@ def post():
 def logout():
 	session.pop('username')
 	return redirect('/')
-'''		
+		
 app.secret_key = 'some key that you will never guess'
 #Run the app on localhost port 5000
 #debug = True -> you don't have to restart flask

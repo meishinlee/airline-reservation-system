@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html style="font-size: 16px;">
   <head>
+    <!--<style>
+      body{background-color: aquamarine;}
+    </style>-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
     <meta name="keywords" content="Key Features">
     <meta name="description" content="">
     <meta name="page_type" content="np-template-header-footer-from-plugin">
     <title>Customer Registration</title>
-    <link rel="stylesheet" href="nicepage.css" media="screen">
-<link rel="stylesheet" href="Customer-Registration.css" media="screen">
-    <script class="u-script" type="text/javascript" src="jquery.js" defer=""></script>
-    <script class="u-script" type="text/javascript" src="nicepage.js" defer=""></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/nicepage.css') }}" media="screen" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/Customer-Registration.css') }}"  media="screen" type="text/css">
+    <script class="u-script" type="text/javascript" src="{{ url_for('static', filename='scripts/jquery.js') }}" defer=""></script>
+    <script class="u-script" type="text/javascript" src="{{ url_for('static', filename='scripts/nicepage.js') }}" defer=""></script>
     <meta name="generator" content="Nicepage 3.11.0, nicepage.com">
     <link id="u-theme-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i">
     
@@ -92,8 +95,8 @@
             <input type="hidden" value="" name="recaptchaResponse">
           </form>
         </div>
-        <a href="Customer-Registration.html" data-page-id="98148059" class="u-active-palette-2-base u-border-2 u-border-hover-palette-2-base u-btn u-button-style u-hover-palette-2-base u-palette-2-base u-btn-2">Cancel</a>
-        <a href="Index.html" data-page-id="1909121869" class="u-btn u-btn-round u-button-style u-hover-palette-1-light-1 u-palette-4-base u-radius-50 u-btn-3">Back to homepage</a>
+        <a href="http://127.0.0.1:5000/Customer-Registration" data-page-id="98148059" class="u-active-palette-2-base u-border-2 u-border-hover-palette-2-base u-btn u-button-style u-hover-palette-2-base u-palette-2-base u-btn-2">Cancel</a>
+        <a href="http://127.0.0.1:5000/" data-page-id="1909121869" class="u-btn u-btn-round u-button-style u-hover-palette-1-light-1 u-palette-4-base u-radius-50 u-btn-3">Back to homepage</a>
       </div>
     </section>
     
