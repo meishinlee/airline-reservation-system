@@ -9,7 +9,7 @@ app = Flask(__name__)
 conn = pymysql.connect(host='localhost',
                        user='root',
                        password='',
-                       db='blog',
+                       db='air ticket reservation system',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 
@@ -30,16 +30,16 @@ def customer_register():
 
 
 #Authenticates the login
-@app.route('/loginAuth', methods=['GET', 'POST'])
+@app.route('/CustomerLoginAuth', methods=['GET', 'POST'])
 def loginAuth():
 	#grabs information from the forms
-	username = request.form['username']
-	password = request.form['password']
+	username = request.form['customer-username']
+	password = request.form['customer-password']
 
 	#cursor used to send queries
 	cursor = conn.cursor()
 	#executes query
-	query = 'SELECT * FROM user WHERE username = %s and password = %s'
+	query = 'SELECT * FROM customer WHERE CustomerEmail = %s and CustomerPassword = %s'
 	cursor.execute(query, (username, password))
 	#stores the results in a variable
 	data = cursor.fetchone()
@@ -50,12 +50,13 @@ def loginAuth():
 		#creates a session for the the user
 		#session is a built in
 		session['username'] = username
-		return redirect(url_for('home'))
+		return redirect(url_for('index.html'))
 	else:
 		#returns an error message to the html page
 		error = 'Invalid login or username'
 		return render_template('login.html', error=error)
 
+'''
 #Authenticates the register
 @app.route('/registerAuth', methods=['GET', 'POST'])
 def registerAuth():
@@ -112,7 +113,9 @@ def post():
 def logout():
 	session.pop('username')
 	return redirect('/')
-		
+
+'''
+	
 app.secret_key = 'some key that you will never guess'
 #Run the app on localhost port 5000
 #debug = True -> you don't have to restart flask
