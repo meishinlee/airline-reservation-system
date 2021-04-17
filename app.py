@@ -50,7 +50,7 @@ def loginAuth():
 		#creates a session for the the user
 		#session is a built in
 		session['username'] = username
-		return redirect(url_for('index.html'))
+		return redirect(url_for('hello'))
 	else:
 		#returns an error message to the html page
 		error = 'Invalid login or username'
