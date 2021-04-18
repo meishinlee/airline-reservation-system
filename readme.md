@@ -1,7 +1,7 @@
 Mei Shin Lee, Ruhejami Mustari 
 
 Finished: 
-- Customer Login ->correct query, but error message is not showing and is not redirecting to the temp view flights page
+- Customer Login -> corrected, not linked to customer home
 - Customer Registration ->not linked to db yet for insert
 - Index 
 - Booking Agent Login -> not linked yet to DB

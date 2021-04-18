@@ -35,8 +35,8 @@ def customerLoginAuth():
 	#grabs information from the forms
 	username = request.form['customer-username']
 	password = request.form['customer-password']
-	print(username)
-	print(password)
+	#print(username)
+	#print(password)
 
 	#cursor used to send queries
 	cursor = conn.cursor()
@@ -48,15 +48,16 @@ def customerLoginAuth():
 	#use fetchall() if you are expecting more than 1 data row
 	cursor.close()
 	error = None
-	print("data:",data)
+	#print("data:",data)
 	if(data):
-		print('data found')
+		#print('data found')
 		#creates a session for the the user
 		#session is a built in
 		session['username'] = username
+		return render_template('index.html')
 		return redirect(url_for('viewFlightsPublic'))
 	else:
-		print("here")
+		#print("here")
 		#returns an error message to the html page
 		error = 'Invalid login or username'
 		return render_template('Customer-Login.html', error=error)
