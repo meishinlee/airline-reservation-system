@@ -54,7 +54,20 @@ def loginAuth():
 	else:
 		#returns an error message to the html page
 		error = 'Invalid login or username'
-		return render_template('login.html', error=error)
+		return render_template('Customer-Login.html', error=error)
+
+@app.route('/View-Flights')
+def home():
+    
+    #username = session['username']
+    cursor = conn.cursor();
+    query = 'SELECT AirlineName, FlightNumber, DepartureDate, ArrivalDate, FlightStatus FROM Flight AS f NATURAL JOIN updates LIMIT 10'
+    cursor.execute(query)
+    data1 = cursor.fetchall() 
+    for each in data1:
+        print(each['AirlineName'])
+    cursor.close()
+    return render_template('View-Flights.html', flights=data1)
 
 '''
 #Authenticates the register

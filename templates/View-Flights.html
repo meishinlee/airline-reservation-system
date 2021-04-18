@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html style="font-size: 16px;">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="View Flights">
+    <meta name="description" content="">
+    <meta name="page_type" content="np-template-header-footer-from-plugin">
+    <title>View Flights</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/nicepage.css') }}"/> 
+<link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/View-Flights.css') }}"/> 
+    <script class="u-script" type="text/javascript" src="{{ url_for('static', filename='scripts/jquery.js') }}" defer=""></script>
+    <script class="u-script" type="text/javascript" src="{{ url_for('static', filename='scripts/nicepage.js') }}" defer=""></script>
+    <meta name="generator" content="Nicepage 3.11.0, nicepage.com">
+    <link id="u-theme-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i">
+    <link id="u-page-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:300,300i,400,400i,500,500i,700,700i">
+    
+    
+    <script type="application/ld+json">{
+		"@context": "http://schema.org",
+		"@type": "Organization",
+		"name": "",
+		"url": "index.html"
+}</script>
+    <meta property="og:title" content="View Flights">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#478ac9">
+    <link rel="canonical" href="index.html">
+    <meta property="og:url" content="index.html">
+  </head>
+  <body class="u-body"><header class="u-clearfix u-header u-header" id="sec-c629"><div class="u-clearfix u-sheet u-sheet-1"></div></header>
+    <section class="u-align-left u-clearfix u-image u-shading u-section-1" id="carousel_b327">
+      <div class="u-clearfix u-sheet u-sheet-1">
+        <h1 class="u-align-center u-custom-font u-font-ubuntu u-text u-text-black u-text-default u-text-1">View Flights</h1>
+        <div class="u-expanded-width u-table u-table-responsive u-table-1">
+          <table class="u-table-entity">
+            <colgroup>
+              <col width="25%">
+              <col width="25%">
+              <col width="25%">
+              <col width="25%">
+            </colgroup>
+            <thead class="u-align-center u-custom-font u-heading-font u-palette-1-base u-table-header u-table-header-1">
+              <tr style="height: 45px;">
+                <th class="u-table-cell">Airline name</th>
+                <th class="u-table-cell">Flight number</th>
+                <th class="u-table-cell">Departure Date</th>
+                <th class="u-table-cell">Arrival Date</th>
+                <th class="u-table-cell">Flight Status</th>
+              </tr>
+            </thead>
+            <tbody class="u-align-center u-table-body u-text-body-color">
+              {%for line in flights %}
+              <tr style="height: 55px;">
+                <td class="u-first-column u-table-cell u-white">{{line['AirlineName']}}</td>
+                <td class="u-table-cell">{{line['FlightNumber']}}</td>
+                <td class="u-table-cell u-white u-table-cell-7">{{line['DepartureDate']}}</td>
+                <td class="u-table-cell">{{line['ArrivalDate']}}</td>
+                <td class="u-table-cell u-white u-table-cell-19">{{line['FlightStatus']}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <a href="http://127.0.0.1:5000/" data-page-id="1909121869" class="u-btn u-btn-round u-button-style u-palette-1-base u-radius-10 u-btn-1">Back to Homepage<br>
+        </a>
+      </div>
+    </section>
+    
+    
+    <footer class="u-align-center u-clearfix u-footer u-grey-80 u-footer" id="sec-4114"><div class="u-clearfix u-sheet u-sheet-1">
+        <p class="u-small-text u-text u-text-variant u-text-1">Databases Project, Spring 2021, Air Reservation System</p>
+      </div></footer>
+    <section class="u-backlink u-clearfix u-grey-80">
+      <a class="u-link" href="https://nicepage.com/html5-template" target="_blank">
+        <span>Free HTML5 Template</span>
+      </a>
+      <p class="u-text">
+        <span>created with</span>
+      </p>
+      <a class="u-link" href="https://nicepage.com/html-website-builder" target="_blank">
+        <span>HTML Editor</span>
+      </a>. 
+    </section>
+  </body>
+</html>

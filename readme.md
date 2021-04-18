@@ -14,11 +14,11 @@ In Progress:
     - Rate/Comment
     - Track Spending 
     - Logout 
+- View Flights (Mei) <- this is just displaying the top x rows with attribute airline name, flight number, arrival/departure, skeleton finished 
 
 To Do: 
 - Booking Agent Register 
 - Airline Staff Login 
 - Airline Staff Register 
-- View Flights <- this is just displaying the top x rows with attribute airline name, flight number, arrival/departure 
 - Search Flights - with customer 
 - How to hash MD5?  

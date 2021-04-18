@@ -360,7 +360,7 @@ span.fr-img-caption.fr-view {
       float: right;
       margin: 5px 0 5px 5px;
       max-width: calc(100% - 5px); }
-/*end-commonstyles library*//*begin-commonstyles library @charset "UTF-8";*/
+/*end-commonstyles library*//*begin-commonstyles library@charset "UTF-8";*/
 
 /*!
  * animate.css -https://daneden.github.io/animate.css/
@@ -32404,7 +32404,7 @@ a.u-link.u-text-hover-grey-90:hover {
         }
         .u-body
         {
-        background-image: url("images/default-image.jpg");
+        background-image: url("undefined");
         background-size: cover;
         background-position: 50% 50%;
         background-repeat: no-repeat;
@@ -32574,27 +32574,11 @@ a.u-link.u-text-hover-grey-90:hover {
 }
 
 .u-header .u-sheet-1 {
-  min-height: 82px;
-}
-
-.u-header .u-menu-1 {
-  margin: 44px 0 0 auto;
-}
-
-.u-header .u-nav-1 {
-  font-size: 1rem;
-  letter-spacing: 0px;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.u-header .u-nav-2 {
-  font-size: 1.25rem;
+  min-height: 17px;
 }
 @media (max-width: 1199px) {
-  .u-header .u-menu-1 {
-    width: auto;
-    margin-right: 0;
+  .u-header .u-sheet-1 {
+    min-height: 17px;
   }
 }
 
