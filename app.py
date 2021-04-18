@@ -28,6 +28,43 @@ def customerLogin():
 def customer_register():
 	return render_template('Customer-Registration.html')
 
+#Authenticates the register
+@app.route('/customerRegisterAuth', methods=['GET', 'POST'])
+def registerAuth():
+	#grabs information from the forms
+	name = request.form['name']
+	phone = request.form['phone']
+	email = request.form['email']
+	password = request.form['password']
+	buildingNumber = request.form['building-number']
+	street = request.form['street']
+	city = request.form['city']
+	state = request.form['state']
+	passportNumber = request.form['passport-number']
+	passportExp = request.form['passport-expiration']
+	passportCountry = request.form['passport-country']
+	dateOfBirth = request.form['date-of-birth']
+
+	#cursor used to send queries
+	cursor = conn.cursor()
+	#executes query
+	noDupEmailQuery = 'SELECT CustomerEmail FROM customer WHERE CustomerEmail = %s'
+	cursor.execute(noDupEmailQuery, (email))
+	#stores the results in a variable
+	data = cursor.fetchone()
+	#use fetchall() if you are expecting more than 1 data row
+	error = None
+	if(data):
+		print('here')
+		#If the previous query returns data, then user exists
+		error = "This user already exists"
+		return render_template('Customer-Registration.html', error = error)
+	else:
+		ins = 'INSERT INTO customer VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+		cursor.execute(ins, (name, email, password, int(buildingNumber), street, city, state, int(phone), passportNumber,passportExp, passportCountry, dateOfBirth))
+		conn.commit()
+		cursor.close()
+		return render_template('index.html')
 
 #Authenticates the login
 @app.route('/CustomerLoginAuth', methods=['GET', 'POST'])
@@ -75,11 +112,37 @@ def viewFlightsPublic():
     return render_template('View-Flights.html', flights=data1)
 
 
-
-#Define route for customer login
+#Define route for booking agent login
 @app.route('/Booking-Agent-Login')
 def bookingAgentlogin():
 	return render_template('Booking-Agent-Login.html')
+
+@app.route('/BookingAgentLoginAuth', methods=['GET', 'POST'])
+def bookingAgentLoginAuth():
+	#grabs information from the forms
+	username = request.form['agent-email-login']
+	password = request.form['agent-password']
+
+	#cursor used to send queries
+	cursor = conn.cursor()
+	#executes query
+	query = 'SELECT AgentEmail, AgentPassword FROM bookingagent WHERE AgentEmail = %s and AgentPassword = %s'
+	cursor.execute(query, (username, password))
+	#stores the results in a variable
+	data = cursor.fetchone()
+	#use fetchall() if you are expecting more than 1 data row
+	cursor.close()
+	error = None
+	if(data):
+		#creates a session for the the user
+		#session is a built in
+		session['username'] = username
+		return render_template('index.html')
+		return redirect(url_for('viewFlightsPublic'))
+	else:
+		#returns an error message to the html page
+		error = 'Invalid login or username'
+		return render_template('Booking-Agent-Login.html', error=error)
 
 '''
 #Authenticates the register

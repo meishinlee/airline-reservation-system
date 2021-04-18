@@ -2,10 +2,14 @@ Mei Shin Lee, Ruhejami Mustari
 
 Finished: 
 - Customer Login -> corrected, not linked to customer home
-- Customer Registration ->not linked to db yet for insert
-- Index 
-- Booking Agent Login -> not linked yet to DB
+- Customer Registration OK, works fine
+- Index -> Not linked to booking reg, airline staff, search flights
+- Booking Agent Login -> Linked to db, not homepage
 - View Flights (Mei), completely finished
+
+Concerns: 
+- Passport number duplicates in database despite different email IDs? 
+- phone number can't exceed 2^10? 
 
 In Progress: 
 - Customer Homepage (Mei), finished design, didn't link the page 
