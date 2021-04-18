@@ -20,7 +20,7 @@ def hello():
 
 #Define route for customer login
 @app.route('/Customer-Login')
-def login():
+def customerLogin():
 	return render_template('Customer-Login.html')
 
 #Define route for register
@@ -31,43 +31,54 @@ def customer_register():
 
 #Authenticates the login
 @app.route('/CustomerLoginAuth', methods=['GET', 'POST'])
-def loginAuth():
+def customerLoginAuth():
 	#grabs information from the forms
 	username = request.form['customer-username']
 	password = request.form['customer-password']
+	print(username)
+	print(password)
 
 	#cursor used to send queries
 	cursor = conn.cursor()
 	#executes query
-	query = 'SELECT * FROM customer WHERE CustomerEmail = %s and CustomerPassword = %s'
+	query = 'SELECT CustomerEmail, CustomerPassword FROM customer WHERE CustomerEmail = %s and CustomerPassword = %s'
 	cursor.execute(query, (username, password))
 	#stores the results in a variable
 	data = cursor.fetchone()
 	#use fetchall() if you are expecting more than 1 data row
 	cursor.close()
 	error = None
+	print("data:",data)
 	if(data):
+		print('data found')
 		#creates a session for the the user
 		#session is a built in
 		session['username'] = username
-		return redirect(url_for('hello'))
+		return redirect(url_for('viewFlightsPublic'))
 	else:
+		print("here")
 		#returns an error message to the html page
 		error = 'Invalid login or username'
 		return render_template('Customer-Login.html', error=error)
 
 @app.route('/View-Flights')
-def home():
-    
+def viewFlightsPublic():
     #username = session['username']
     cursor = conn.cursor();
-    query = 'SELECT AirlineName, FlightNumber, DepartureDate, ArrivalDate, FlightStatus FROM Flight AS f NATURAL JOIN updates LIMIT 10'
+    query = 'SELECT AirlineName, FlightNumber, DepartureDate, ArrivalDate, FlightStatus FROM Flight AS f NATURAL JOIN updates ORDER BY DepartureDate LIMIT 10'
     cursor.execute(query)
     data1 = cursor.fetchall() 
     for each in data1:
         print(each['AirlineName'])
     cursor.close()
     return render_template('View-Flights.html', flights=data1)
+
+
+
+#Define route for customer login
+@app.route('/Booking-Agent-Login')
+def bookingAgentlogin():
+	return render_template('Booking-Agent-Login.html')
 
 '''
 #Authenticates the register
