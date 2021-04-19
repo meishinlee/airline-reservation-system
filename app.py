@@ -66,38 +66,70 @@ def registerAuth():
 		cursor.close()
 		return render_template('index.html')
 
+def get_cust_credentials(): 
+	username = request.form['customer-username']
+	password = request.form['customer-password']
+	return username, password
+
 #Authenticates the login
 @app.route('/CustomerLoginAuth', methods=['GET', 'POST'])
 def customerLoginAuth():
 	#grabs information from the forms
-	username = request.form['customer-username']
-	password = request.form['customer-password']
+	#username = request.form['customer-username']
+	#password = request.form['customer-password']
+	username, password = get_cust_credentials()
 	#print(username)
 	#print(password)
-
 	#cursor used to send queries
 	cursor = conn.cursor()
 	#executes query
-	query = 'SELECT CustomerEmail, CustomerPassword FROM customer WHERE CustomerEmail = %s and CustomerPassword = %s'
+	query = 'SELECT CustomerName, CustomerEmail, CustomerPassword FROM customer WHERE CustomerEmail = %s and CustomerPassword = %s'
 	cursor.execute(query, (username, password))
 	#stores the results in a variable
 	data = cursor.fetchone()
 	#use fetchall() if you are expecting more than 1 data row
 	cursor.close()
 	error = None
-	#print("data:",data)
 	if(data):
 		#print('data found')
 		#creates a session for the the user
 		#session is a built in
 		session['username'] = username
-		return render_template('index.html')
-		return redirect(url_for('viewFlightsPublic'))
+		'''
+		getName = 'SELECT CustomerName FROM customer WHERE CustomerEmail = %s and CustomerPassword = %s'
+		cursor.execute(getName, (username, password))
+		customerName = cursor.fetchone()
+		print(customerName)
+		cursor.close()
+		'''
+		return render_template('Customer-Home.html', name = username)
+		#return redirect(url_for('customerHome', username = username))
 	else:
 		#print("here")
 		#returns an error message to the html page
 		error = 'Invalid login or username'
 		return render_template('Customer-Login.html', error=error)
+
+
+@app.route('/Customer-Home')
+def customerHome(): 
+	return render_template('Customer-Home.html', name = session['username'])
+'''
+@app.route('/View-Customer-Flights') #needs a query for this!!
+def viewCustomerFlights(): 
+	cursor = conn.cursor();
+    query = 'SELECT AirlineName, FlightNumber, DepartureDate, DepartureTime, ArrivalDate, ArrivalTime, FlightStatus FROM Flight AS f NATURAL JOIN updates ORDER BY DepartureDate LIMIT 10'
+    cursor.execute(query)
+    data1 = cursor.fetchall() 
+    for each in data1:
+        print(each['AirlineName'])
+    cursor.close()
+    return render_template('View-Customer-Flights.html', flights=data1)
+	#return render_template('View-Customer-Flights.html')
+'''
+@app.route('/Customer-Search-Flights') #needs a query for this!! 
+def searchCustomerFlights(): 
+	return render_template('Customer-Search-Flights.html',)
 
 @app.route('/View-Flights')
 def viewFlightsPublic():
@@ -111,6 +143,9 @@ def viewFlightsPublic():
     cursor.close()
     return render_template('View-Flights.html', flights=data1)
 
+@app.route('/Search-Flights')
+def searchFlights():
+	return render_template('Search-Flights.html')
 
 #Define route for booking agent login
 @app.route('/Booking-Agent-Login')
@@ -143,6 +178,37 @@ def bookingAgentLoginAuth():
 		#returns an error message to the html page
 		error = 'Invalid login or username'
 		return render_template('Booking-Agent-Login.html', error=error)
+
+@app.route('/Airline-Staff-Login')
+def AirlineStafflogin():
+	return render_template('Airline-Staff-Login.html')
+
+@app.route('/AirlineStaffLoginAuth', methods=['GET', 'POST'])
+def AirlineStaffLoginAuth():
+	#grabs information from the forms
+	username = request.form['airline-staff-username']
+	password = request.form['airline-staff-password']
+
+	#cursor used to send queries
+	cursor = conn.cursor()
+	#executes query
+	query = 'SELECT Username, StaffPassword FROM airlinestaff WHERE Username = %s and StaffPassword = %s'
+	cursor.execute(query, (username, password))
+	#stores the results in a variable
+	data = cursor.fetchone()
+	#use fetchall() if you are expecting more than 1 data row
+	cursor.close()
+	error = None
+	if(data):
+		#creates a session for the the user
+		#session is a built in
+		session['username'] = username
+		return render_template('index.html')
+		#return redirect(url_for('viewFlightsPublic'))
+	else:
+		#returns an error message to the html page
+		error = 'Invalid login or username'
+		return render_template('Airline-Staff-Login.html', error=error)
 
 '''
 #Authenticates the register
