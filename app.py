@@ -1,6 +1,8 @@
 #Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect
 import pymysql.cursors
+from datetime import datetime
+from datetime import date
 
 #Initialize the app from Flask
 app = Flask(__name__)
@@ -66,18 +68,19 @@ def registerAuth():
 		cursor.close()
 		return render_template('index.html')
 
+'''
 def get_cust_credentials(): 
 	username = request.form['customer-username']
 	password = request.form['customer-password']
 	return username, password
-
+'''
 #Authenticates the login
 @app.route('/CustomerLoginAuth', methods=['GET', 'POST'])
 def customerLoginAuth():
 	#grabs information from the forms
-	#username = request.form['customer-username']
-	#password = request.form['customer-password']
-	username, password = get_cust_credentials()
+	username = request.form['customer-username']
+	password = request.form['customer-password']
+	#username, password = get_cust_credentials()
 	#print(username)
 	#print(password)
 	#cursor used to send queries
@@ -95,41 +98,74 @@ def customerLoginAuth():
 		#creates a session for the the user
 		#session is a built in
 		session['username'] = username
-		'''
-		getName = 'SELECT CustomerName FROM customer WHERE CustomerEmail = %s and CustomerPassword = %s'
-		cursor.execute(getName, (username, password))
-		customerName = cursor.fetchone()
-		print(customerName)
-		cursor.close()
-		'''
 		return render_template('Customer-Home.html', name = username)
-		#return redirect(url_for('customerHome', username = username))
 	else:
 		#print("here")
 		#returns an error message to the html page
 		error = 'Invalid login or username'
 		return render_template('Customer-Login.html', error=error)
 
+@app.route('/logout')
+def logout():
+	session.pop('username')
+	print(session)
+	return redirect('/')
 
 @app.route('/Customer-Home')
 def customerHome(): 
 	return render_template('Customer-Home.html', name = session['username'])
-'''
+
 @app.route('/View-Customer-Flights') #needs a query for this!!
-def viewCustomerFlights(): 
+def viewCustomerFlights():
+	username = session['username']
 	cursor = conn.cursor();
-    query = 'SELECT AirlineName, FlightNumber, DepartureDate, DepartureTime, ArrivalDate, ArrivalTime, FlightStatus FROM Flight AS f NATURAL JOIN updates ORDER BY DepartureDate LIMIT 10'
-    cursor.execute(query)
-    data1 = cursor.fetchall() 
-    for each in data1:
-        print(each['AirlineName'])
-    cursor.close()
-    return render_template('View-Customer-Flights.html', flights=data1)
-	#return render_template('View-Customer-Flights.html')
-'''
+	query = 'SELECT AirlineName, FlightNumber, DepartureDate, DepartureTime, ArrivalDate, ArrivalTime, FlightStatus FROM Flight NATURAL JOIN updates NATURAL JOIN purchasedfor NATURAL JOIN ticket NATURAL JOIN customer WHERE CustomerEmail = %s ORDER BY DepartureDate LIMIT 5'
+	cursor.execute(query, (username))
+	data1 = cursor.fetchall() 
+	for each in data1:
+		print(each['AirlineName'])
+		cursor.close()
+	return render_template('View-Customer-Flights.html', custFlights=data1)
+
 @app.route('/Customer-Search-Flights') #needs a query for this!! 
 def searchCustomerFlights(): 
-	return render_template('Customer-Search-Flights.html',)
+	return render_template('Customer-Search-Flights.html')
+
+@app.route('/Rate-my-Flights')
+def rateCustomerFlights(): 
+	return render_template('Rate-my-Flights.html')
+
+@app.route('/RateFlightAuth', methods=['GET', 'POST'])
+def rateFlightAuth(): 
+	customerEmail = session['username']
+	custTicketID = request.form['ticket-number']
+	custRate = request.form['rate']
+	custComment = request.form['comment']
+	cursor = conn.cursor(); 
+	checkCustFlightExist = 'SELECT FlightNumber, DepartureDate, DepartureTime FROM ticket NATURAL JOIN purchasedfor NATURAL JOIN customer WHERE CustomerEmail = %s AND TicketID = %s AND (CURRENT_DATE < DepartureDate OR (CURRENT_DATE = DepartureDate AND CURRENT_TIME < DepartureTime))'
+	cursor.execute(checkCustFlightExist,(customerEmail, custTicketID))
+	data1 = cursor.fetchone()
+	checkNoRate = 'SELECT FlightNumber, DepartureDate, DepartureTime, TicketID FROM suggested NATURAL JOIN ticket WHERE CustomerEmail = %s AND TicketID = %s'
+	cursor.execute(checkNoRate, (customerEmail, custTicketID))
+	data2 = cursor.fetchone()
+	print(data2)
+	if(data1 and not(data2)): #customer was on the flight and there was no rating written 
+		custFlightNum = data1['FlightNumber']
+		custDeptDate = data1['DepartureDate']
+		custDeptTime = data1['DepartureTime']
+		ins = 'INSERT INTO suggested VALUES(%s, %s, %s, %s, %s, %s)'
+		cursor.execute(ins, (customerEmail, custFlightNum, custDeptDate, custDeptTime, custComment, custRate))
+		conn.commit()
+		cursor.close()
+		message = "Submitted Successfully! Click the back button to go home!"
+		return render_template('Rate-my-Flights.html', message = message)
+	elif (data2): 
+		error = "Flight already given a rating"
+		return render_template('Rate-my-Flights.html', error=error)
+	else: 
+		error = "Ticket ID does not exist"
+		return render_template('Rate-my-Flights.html', error=error)
+	
 
 @app.route('/View-Flights')
 def viewFlightsPublic():
