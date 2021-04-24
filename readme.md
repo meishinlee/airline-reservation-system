@@ -9,7 +9,7 @@ Finished:
 - Airline Staff Register -> Finished linking completely
 
 - Airline Staff Login -> linked to auth in db, not linked to airline staff homepage 
-- Booking Agent Register -> linked to DB, but submit button isn't working 
+- Booking Agent Register -> OK
 - Airline Staff Home (Ruhejami, Finished. Pages Unlinked to backend)
     - Airline staff form submitted but not written in backend  
 

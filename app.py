@@ -94,11 +94,13 @@ def customerLoginAuth():
 	#use fetchall() if you are expecting more than 1 data row
 	cursor.close()
 	error = None
+	'''
 	sessionRunning = isSessionLoggedIn()
 	if (sessionRunning == True): 
 		error = 'Other users signed in. Please sign out of current session.'
 		return render_template('Customer-Login.html', error=error)
-	elif(data):
+	'''
+	if(data):
 		#print('data found')
 		#creates a session for the the user
 		#session is a built in
@@ -209,11 +211,13 @@ def bookingAgentLoginAuth():
 	#use fetchall() if you are expecting more than 1 data row
 	cursor.close()
 	error = None
+	'''
 	sessionRunning = isSessionLoggedIn()
 	if (sessionRunning == True): 
 		error = 'Other users signed in. Please sign out of current session.'
 		return render_template('Booking-Agent-Login.html', error=error)
-	elif(data):
+	'''
+	if(data):
 		#creates a session for the the user
 		#session is a built in
 		session['username'] = username
@@ -274,20 +278,26 @@ def AirlineStaffLoginAuth():
 	#use fetchall() if you are expecting more than 1 data row
 	cursor.close()
 	error = None
+	'''
 	sessionRunning = isSessionLoggedIn()
 	if (sessionRunning == True): 
 		error = 'Other users signed in. Please sign out of current session.'
 		return render_template('Airline-Staff-Login.html', error=error)
-	elif(data):
+	'''
+	if(data):
 		#creates a session for the the user
 		#session is a built in
 		session['username'] = username
-		return render_template('index.html')
+		return render_template('Airline-Staff-Home.html')
 		#return redirect(url_for('viewFlightsPublic'))
 	else:
 		#returns an error message to the html page
 		error = 'Invalid login or username'
 		return render_template('Airline-Staff-Login.html', error=error)
+
+@app.route('/Airline-Staff-Home')
+def airline_staff_home(): 
+	return render_template('Airline-Staff-Home.html')
 
 @app.route('/Airline-Staff-Registration')
 def airline_staff_register():
