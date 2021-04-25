@@ -12,6 +12,7 @@ Finished:
 - Booking Agent Register -> OK
 - Airline Staff Home (Ruhejami, Finished. Pages Unlinked to backend)
     - Airline staff form submitted but not written in backend  
+- Booking Agent Home Page (finished)
 
 Concerns: 
 - Passport number duplicates in database despite different email IDs? 
@@ -24,12 +25,21 @@ In Progress:
     - Perform another search, back to home. 
 - Customer Homepage (Mei), finished design, didn't link the page 
     - View my Flights (Finished)
-    - Search flights (linked to customer home page, but whats a round trip)? 
-    - Purchase Tickets (didn't start!!)
+    - Search flights/Purchase Tickets (linked to customer home page, but whats a round trip)? 
     - Rate/Comment (finished). Added additional constraint where I checked for no dup ratings 
     - Track Spending (didn't start idk how to make a barchart) !!!
     - Logout (finished)
-- Booking Agent Home Page (designing)
+- Booking Agent Homepage 
+    - View my Flights (ERROR NOT SHOWING WHEN CUSTOMER NOT FOUND), finished otherwise 
+    - Search my Flights/Purchase Tickets (Have not Started)
+    - View my Commissions (Finished)
+    - Top 5 Customers (idk how to make a chart!!!)
+    - Logout (finished)
+- Airline Staff Homepage 
+    - Create flights <--By default should i have a 'On time' Flight status?
+    - Update stuff 
+    - Logout (Finished)
+
 
 To Do: 
 - Search Flights - with customer 

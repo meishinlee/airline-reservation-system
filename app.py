@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, session, url_for, redirect
 import pymysql.cursors
 from datetime import datetime
 from datetime import date
+import hashlib
 
 #Initialize the app from Flask
 app = Flask(__name__)
@@ -62,6 +63,7 @@ def registerAuth():
 		error = "This user already exists"
 		return render_template('Customer-Registration.html', error = error)
 	else:
+		#password = hashlib.md5(password.encode())
 		ins = 'INSERT INTO customer VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
 		cursor.execute(ins, (name, email, password, int(buildingNumber), street, city, state, int(phone), passportNumber,passportExp, passportCountry, dateOfBirth))
 		conn.commit()
@@ -221,11 +223,60 @@ def bookingAgentLoginAuth():
 		#creates a session for the the user
 		#session is a built in
 		session['username'] = username
-		return render_template('index.html')
+		return render_template('Booking-Agent-Home.html', username = session['username'])
 	else:
 		#returns an error message to the html page
 		error = 'Invalid login or username'
 		return render_template('Booking-Agent-Login.html', error=error)
+
+@app.route('/Booking-Agent-Home', methods=['GET', 'POST'])
+def bookingAgentHome(): 
+	return render_template('Booking-Agent-Home.html', username = session['username'])
+
+@app.route('/Booking-Agent-View-Customer-Flights-first')
+def bookingAgentViewCustFlights(): 
+	print("here")
+	username = 0
+	cursor = conn.cursor()
+	#executes query
+	query = 'SELECT AirlineName, FlightNumber, DepartureDate, ArrivalDate, FlightStatus FROM ticket NATURAL JOIN purchasedfor NATURAL JOIN customer NATURAL JOIN flight NATURAL JOIN updates WHERE CustomerEmail = %s'
+	cursor.execute(query, (username))
+	#stores the results in a variable
+	data1 = cursor.fetchall()
+	#use fetchall() if you are expecting more than 1 data row
+	cursor.close()
+	error = None
+	return render_template('Booking-Agent-View-Customer-Flights-first.html')
+
+@app.route('/Booking-Agent-View-Customer-Flights-second', methods=['GET','POST'])
+def bookingAgentViewCustFlightssecond(): 
+	print("here")
+	username = request.form['customer-username']
+	print(username)
+	cursor = conn.cursor()
+	queryUser = 'SELECT customeremail FROM customer WHERE customeremail = %s'
+	cursor.execute(queryUser, (username))
+	userData = cursor.fetchone()
+	#executes query
+	print(userData)
+	if(userData): 
+		print("user data found")
+		query = 'SELECT AirlineName, FlightNumber, DepartureDate, DepartureTime, ArrivalDate, ArrivalTime, FlightStatus FROM ticket NATURAL JOIN purchasedfor NATURAL JOIN customer NATURAL JOIN flight NATURAL JOIN updates WHERE CustomerEmail = %s'
+		cursor.execute(query, (username))
+		#stores the results in a variable
+		data1 = cursor.fetchall()
+		print(data1)
+		#if(len(data1) != ()): 
+		#use fetchall() if you are expecting more than 1 data row
+		cursor.close()
+		error = None
+		return render_template('Booking-Agent-View-Customer-Flights-second.html', flights=data1, error = error)
+	else:
+		data1= ""
+		print("here error")
+		error = "user does not exist" 
+		return render_template('Booking-Agent-View-Customer-Flights-second.html', flights = data1, error = error)#, flights=data1, error = error)
+
 
 @app.route('/Booking-Agent-Registration')
 def booking_agent_register():
@@ -257,6 +308,37 @@ def bookingAgentRegisterAuth():
 		conn.commit()
 		cursor.close()
 		return render_template('index.html')
+
+@app.route('/Top-Customers')
+def topCusts(): 
+	username = session['username']
+	cursor = conn.cursor()
+	topCusts = 'SELECT customerEmail, SUM(CommissionAmount) AS commission FROM customer NATURAL JOIN ticket NATURAL JOIN creates WHERE agentemail = %s GROUP BY customerEmail ORDER BY commission DESC LIMIT 5'
+	cursor.execute(topCusts, (username))
+	data = cursor.fetchall()
+	print(username)
+	return render_template('Top-Customers.html', topCusts = data)
+
+@app.route('/View-Commissions')
+def view_commissions_main(): 
+	username = session['username']
+	cursor = conn.cursor() 
+	statistics = 'SELECT SUM(commissionAmount) AS totalcom, SUM(commissionAmount)/COUNT(*) as avgcom, COUNT(ticketID) AS numtickets FROM creates NATURAL JOIN ticket WHERE AgentEmail = %s AND CURRENT_DATE - 30 <= puchaseDate'
+	cursor.execute(statistics, (username))
+	comStats = cursor.fetchone() 
+	print(comStats)
+	return render_template("View-Commissions.html", stats = comStats)
+
+@app.route('/Booking-Agent-Date-Coms', methods=['GET', 'POST'])
+def bookingAgentDatesCommissions(): 
+	start_date = request.form['start-date']
+	end_date = request.form['end-date']
+	username = session['username']
+	cursor = conn.cursor() 
+	statistics = 'SELECT SUM(commissionAmount) AS totalcom, SUM(commissionAmount)/COUNT(*) as avgcom, COUNT(ticketID) AS numtickets FROM creates NATURAL JOIN ticket WHERE AgentEmail = %s AND PuchaseDate >= %s AND PuchaseDate <= %s'
+	cursor.execute(statistics, (username, start_date, end_date))
+	comStats = cursor.fetchone() 
+	return render_template('Booking-Agent-Date-Coms.html', stats = comStats)
 
 @app.route('/Airline-Staff-Login')
 def AirlineStafflogin():
@@ -333,6 +415,104 @@ def airlineStaffRegisterAuth():
 		conn.commit()
 		cursor.close()
 		return render_template('index.html')
+
+@app.route('/Airline-Staff-Create')
+def airline_staff_create(): 
+	return render_template('Airline-Staff-Create.html')
+
+
+@app.route('/Airline-Staff-Create-Flight')
+def airline_staff_create_flight(): 
+	airline_name = request.form[""]
+	flight_number = request.form[""]
+	departure_air = request.form[""]
+	departure_date = request.form[""]
+	departure_time = request.form[""] #input type = 'time'
+	arrival_air = request.form[""]
+	arrival_date = request.form[""]
+	arrival_time = request.form[""]
+	base_price = request.form[""]
+	airplane_id = request.form[""]
+	
+	#primary key for flight is deptDate, deptTime, flightNum
+	cursor = conn.cursor() 
+	noExistFlight = 'SELECT * FROM flight WHERE FlightNumber = %s AND DepartureDate = %s AND DepartureTime = %s'
+	cursor.execute(noExistFlight, (departure_date, departure_time, flight_number))
+	data = cursor.fetchone()
+	if(data): #if exists
+		error = "Flight not added. Flight Already Exists"
+		return render_template('Booking-Agent-Home.html')
+	else: 
+		ins = 'INSERT INTO flight VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+		cursor.execute(ins, (airline_name, departure_date, departure_time, flight_number, departure_air, arrival_air, arrival_time, arrival_date, base_price, airplane_id))
+		conn.commit()
+		cursor.close()
+		error = "Flight successfully added."
+		return render_template('Booking-Agent-Home.html')
+
+@app.route('/Update-Flight-Status')
+def update_flight_status():
+	username = session['username'] 
+	flight_number = request.form['']
+	departure_date = request.form['']
+	departure_time = request.form['']
+	flight_status = request.form['']
+
+	cursor = conn.cursor()
+	flightExists = 'SELECT * FROM updates WHERE FlightNumber = %s AND DepartureDate = %s AND DepartureTime = %s'
+	cursor.execute(flightExists, (flight_number, departure_date, departure_time))
+	data = cursor.fetchone()
+	if(data): 
+		updateFlight = 'UPDATE updates SET FlightStatus = %s, Username = %s WHERE FlightNumber = %s AND DepartureDate = %s AND DepartureTime = %s'
+		cursor.execute(updateFlight, (flight_status, username, flight_number, departure_date, departure_time))
+		cursor.commit() 
+		cursor.close()
+		error = "Flight Status Updated Successfully"
+		return render_template("Booking-Agent-Home.html")
+	else: 
+		error = 'Update Flight Status Failed. Flight does not exist'
+		return render_template("Booking-Agent-Home.html")
+
+@app.route('/Add-Airplane')
+def add_airplane(): 
+	airline_name = request.form['']
+	airplane_id = request.form['']
+	num_seats = request.form['']
+
+	cursor = conn.cursor() 
+	airplaneDNE = 'SELECT * FROM airplane WHERE AirlineName = %s AND AirplaneID = %s'
+	cursor.execute(airplaneDNE, (airline_name, airplane_id))
+	data = cursor.fetchone()
+	if(data): 
+		error = 'Airplane not added. Airplane already exists'
+		return render_template('Booking-Agent-Home.html')
+	else: 
+		addAirplane = 'INSERT INTO airplane VALUES(%s, %s, %s)'
+		cursor.execute(addAirplane, (airline_name, airplane_id, num_seats))
+		cursor.commit()
+		cursor.close()
+		error = "Airplane added successfully"
+		return render_template('Booking-Agent-Home.html')
+
+@app.route('/Add-Airport')
+def add_airport(): 
+	airport_name = request.form['']
+	airport_city = request.form['']
+
+	cursor = conn.cursor()
+	airportDNE = 'SELECT * FROM airport WHERE AirportName = %s'
+	cursor.execute(airportDNE, (airport_name))
+	data = cursor.fetchone()
+	if(data): 
+		error = 'Airport not added. Airport already exists'
+		return render_template('Airline-Staff-Home.html')
+	else: 
+		addAirport = 'INSERT INTO airport VALUES(%s, %s)'
+		cursor.execute(addAirport, (airport_name, airport_city))
+		cursor.commit()
+		cursor.close()
+		error = 'Airport successfully added'
+		return render_template('Airline-Staff-Home.html')
 
 '''
 #Authenticates the register
