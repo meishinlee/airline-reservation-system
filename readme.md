@@ -39,6 +39,8 @@ In Progress:
     - Create flights <--By default should i have a 'On time' Flight status?
     - Update stuff 
     - Logout (Finished)
+    - View ratings
+    - View customers/booking agents
 
 
 To Do: 

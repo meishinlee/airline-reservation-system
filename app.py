@@ -235,7 +235,7 @@ def bookingAgentHome():
 
 @app.route('/Booking-Agent-View-Customer-Flights-first')
 def bookingAgentViewCustFlights(): 
-	print("here")
+	#print("here")
 	username = 0
 	cursor = conn.cursor()
 	#executes query
@@ -250,7 +250,7 @@ def bookingAgentViewCustFlights():
 
 @app.route('/Booking-Agent-View-Customer-Flights-second', methods=['GET','POST'])
 def bookingAgentViewCustFlightssecond(): 
-	print("here")
+	#print("here")
 	username = request.form['customer-username']
 	print(username)
 	cursor = conn.cursor()
@@ -273,7 +273,7 @@ def bookingAgentViewCustFlightssecond():
 		return render_template('Booking-Agent-View-Customer-Flights-second.html', flights=data1, error = error)
 	else:
 		data1= ""
-		print("here error")
+		#print("here error")
 		error = "user does not exist" 
 		return render_template('Booking-Agent-View-Customer-Flights-second.html', flights = data1, error = error)#, flights=data1, error = error)
 
