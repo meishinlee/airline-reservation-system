@@ -36,11 +36,15 @@ In Progress:
     - Top 5 Customers (idk how to make a chart!!!)
     - Logout (finished)
 - Airline Staff Homepage 
+    - View flights
     - Create flights <--By default should i have a 'On time' Flight status?
-    - Update stuff 
+    - Update stuff (change flight status, add airplane, add airport)
     - Logout (Finished)
     - View ratings
-    - View customers/booking agents
+    - View top 5 booking agents by commission
+    - View most frequent customer, list of flights a particular customer has taken on that airline 
+    - View reports 
+
 
 
 To Do: 

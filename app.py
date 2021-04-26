@@ -96,12 +96,12 @@ def customerLoginAuth():
 	#use fetchall() if you are expecting more than 1 data row
 	cursor.close()
 	error = None
-	'''
+	
 	sessionRunning = isSessionLoggedIn()
 	if (sessionRunning == True): 
 		error = 'Other users signed in. Please sign out of current session.'
 		return render_template('Customer-Login.html', error=error)
-	'''
+	
 	if(data):
 		#print('data found')
 		#creates a session for the the user
@@ -119,6 +119,7 @@ def logout():
 	session.pop('username')
 	print(session)
 	return redirect('/')
+	#return render_template('index.html')
 
 @app.route('/Customer-Home')
 def customerHome(): 
@@ -213,12 +214,12 @@ def bookingAgentLoginAuth():
 	#use fetchall() if you are expecting more than 1 data row
 	cursor.close()
 	error = None
-	'''
+	
 	sessionRunning = isSessionLoggedIn()
 	if (sessionRunning == True): 
 		error = 'Other users signed in. Please sign out of current session.'
 		return render_template('Booking-Agent-Login.html', error=error)
-	'''
+	
 	if(data):
 		#creates a session for the the user
 		#session is a built in
@@ -235,7 +236,6 @@ def bookingAgentHome():
 
 @app.route('/Booking-Agent-View-Customer-Flights-first')
 def bookingAgentViewCustFlights(): 
-	#print("here")
 	username = 0
 	cursor = conn.cursor()
 	#executes query
@@ -338,7 +338,7 @@ def bookingAgentDatesCommissions():
 	statistics = 'SELECT SUM(commissionAmount) AS totalcom, SUM(commissionAmount)/COUNT(*) as avgcom, COUNT(ticketID) AS numtickets FROM creates NATURAL JOIN ticket WHERE AgentEmail = %s AND PuchaseDate >= %s AND PuchaseDate <= %s'
 	cursor.execute(statistics, (username, start_date, end_date))
 	comStats = cursor.fetchone() 
-	return render_template('Booking-Agent-Date-Coms.html', stats = comStats)
+	return render_template('Booking-Agent-Date-Coms.html', stats = comStats, given_start_date = start_date, given_end_date = end_date)
 
 @app.route('/Airline-Staff-Login')
 def AirlineStafflogin():
@@ -360,12 +360,12 @@ def AirlineStaffLoginAuth():
 	#use fetchall() if you are expecting more than 1 data row
 	cursor.close()
 	error = None
-	'''
+	
 	sessionRunning = isSessionLoggedIn()
 	if (sessionRunning == True): 
 		error = 'Other users signed in. Please sign out of current session.'
 		return render_template('Airline-Staff-Login.html', error=error)
-	'''
+	
 	if(data):
 		#creates a session for the the user
 		#session is a built in
