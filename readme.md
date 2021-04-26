@@ -1,10 +1,11 @@
 Mei Shin Lee, Ruhejami Mustari 
 
 Finished: 
+- All MD5s hashed
 - Customer Login -> finished
 - Customer Registration OK, works fine
 - Index -> Not linked to booking reg, airline staff reg
-- Booking Agent Login -> Linked to db, not Agent homepage
+- Booking Agent Login -> finished
 - View Flights (Mei), completely finished
 - Airline Staff Register -> Finished linking completely
 
@@ -36,8 +37,8 @@ In Progress:
     - Top 5 Customers (idk how to make a chart!!!)
     - Logout (finished)
 - Airline Staff Homepage 
-    - View flights
-    - Create flights <--By default should i have a 'On time' Flight status?
+    - View flights 
+    - Create flights <--By default should i have a 'On time' Flight status (updates table)?
     - Update stuff (change flight status, add airplane, add airport)
     - Logout (Finished)
     - View ratings
@@ -48,7 +49,6 @@ In Progress:
 
 
 To Do: 
-- Search Flights - with customer 
-- How to hash MD5?  
+- Search Flights - with customer  
 - Purchase Tickets 
 - Booking Agent and Airline Staff Pages

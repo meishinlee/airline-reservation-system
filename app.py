@@ -64,7 +64,7 @@ def registerAuth():
 		return render_template('Customer-Registration.html', error = error)
 	else:
 		#password = hashlib.md5(password.encode())
-		ins = 'INSERT INTO customer VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+		ins = 'INSERT INTO customer VALUES(%s, %s, md5(%s), %s, %s, %s, %s, %s, %s, %s, %s, %s)'
 		cursor.execute(ins, (name, email, password, int(buildingNumber), street, city, state, int(phone), passportNumber,passportExp, passportCountry, dateOfBirth))
 		conn.commit()
 		cursor.close()
@@ -89,7 +89,7 @@ def customerLoginAuth():
 	#cursor used to send queries
 	cursor = conn.cursor()
 	#executes query
-	query = 'SELECT CustomerName, CustomerEmail, CustomerPassword FROM customer WHERE CustomerEmail = %s and CustomerPassword = %s'
+	query = 'SELECT CustomerName, CustomerEmail, CustomerPassword FROM customer WHERE CustomerEmail = %s and CustomerPassword = md5(%s)'
 	cursor.execute(query, (username, password))
 	#stores the results in a variable
 	data = cursor.fetchone()
@@ -128,7 +128,7 @@ def customerHome():
 @app.route('/View-Customer-Flights') #needs a query for this!!
 def viewCustomerFlights():
 	username = session['username']
-	cursor = conn.cursor();
+	cursor = conn.cursor()
 	query = 'SELECT AirlineName, FlightNumber, DepartureDate, DepartureTime, ArrivalDate, ArrivalTime, FlightStatus FROM Flight NATURAL JOIN updates NATURAL JOIN purchasedfor NATURAL JOIN ticket NATURAL JOIN customer WHERE CustomerEmail = %s ORDER BY DepartureDate LIMIT 5'
 	cursor.execute(query, (username))
 	data1 = cursor.fetchall() 
@@ -203,12 +203,13 @@ def bookingAgentLoginAuth():
 	#grabs information from the forms
 	username = request.form['agent-email-login']
 	password = request.form['agent-password']
+	agent_id = request.form['agent-id']
 
 	#cursor used to send queries
 	cursor = conn.cursor()
 	#executes query
-	query = 'SELECT AgentEmail, AgentPassword FROM bookingagent WHERE AgentEmail = %s and AgentPassword = %s'
-	cursor.execute(query, (username, password))
+	query = 'SELECT AgentEmail, AgentPassword, AgentID FROM bookingagent WHERE AgentEmail = %s and AgentPassword = md5(%s) AND AgentID = %s'
+	cursor.execute(query, (username, password, agent_id))
 	#stores the results in a variable
 	data = cursor.fetchone()
 	#use fetchall() if you are expecting more than 1 data row
@@ -303,7 +304,7 @@ def bookingAgentRegisterAuth():
 		error = "This user already exists"
 		return render_template('Booking-Agent-Registration.html', error = error)
 	else:
-		ins = 'INSERT INTO bookingagent VALUES(%s, %s, %s)'
+		ins = 'INSERT INTO bookingagent VALUES(%s, md5(%s), %s)'
 		cursor.execute(ins, (email, password, agent_id))
 		conn.commit()
 		cursor.close()
@@ -317,6 +318,7 @@ def topCusts():
 	cursor.execute(topCusts, (username))
 	data = cursor.fetchall()
 	print(username)
+	cursor.close()
 	return render_template('Top-Customers.html', topCusts = data)
 
 @app.route('/View-Commissions')
@@ -327,6 +329,7 @@ def view_commissions_main():
 	cursor.execute(statistics, (username))
 	comStats = cursor.fetchone() 
 	print(comStats)
+	cursor.close()
 	return render_template("View-Commissions.html", stats = comStats)
 
 @app.route('/Booking-Agent-Date-Coms', methods=['GET', 'POST'])
@@ -338,6 +341,7 @@ def bookingAgentDatesCommissions():
 	statistics = 'SELECT SUM(commissionAmount) AS totalcom, SUM(commissionAmount)/COUNT(*) as avgcom, COUNT(ticketID) AS numtickets FROM creates NATURAL JOIN ticket WHERE AgentEmail = %s AND PuchaseDate >= %s AND PuchaseDate <= %s'
 	cursor.execute(statistics, (username, start_date, end_date))
 	comStats = cursor.fetchone() 
+	cursor.close()
 	return render_template('Booking-Agent-Date-Coms.html', stats = comStats, given_start_date = start_date, given_end_date = end_date)
 
 @app.route('/Airline-Staff-Login')
@@ -353,7 +357,7 @@ def AirlineStaffLoginAuth():
 	#cursor used to send queries
 	cursor = conn.cursor()
 	#executes query
-	query = 'SELECT Username, StaffPassword FROM airlinestaff WHERE Username = %s and StaffPassword = %s'
+	query = 'SELECT Username, StaffPassword FROM airlinestaff WHERE Username = %s and StaffPassword = md5(%s)'
 	cursor.execute(query, (username, password))
 	#stores the results in a variable
 	data = cursor.fetchone()
@@ -410,11 +414,27 @@ def airlineStaffRegisterAuth():
 		error = "This user already exists"
 		return render_template('Airline-Staff-Registration.html', error = error)
 	else:
-		ins = 'INSERT INTO airlinestaff VALUES(%s, %s, %s, %s, %s, %s)'
+		ins = 'INSERT INTO airlinestaff VALUES(%s, md5(%s), %s, %s, %s, %s)'
 		cursor.execute(ins, (username, password, fname, lname, dob, airline))
 		conn.commit()
 		cursor.close()
 		return render_template('index.html')
+
+@app.route('/Airline-Staff-View-Flights', methods = ['GET','POST'])
+def airline_staff_view_flights(): 
+	username = session['username']
+	cursor = conn.cursor() 
+	findAirlineName = 'SELECT AirlineName FROM airlinestaff WHERE Username = %s'
+	cursor.execute(findAirlineName, (username))
+	airlineName = cursor.fetchone()
+	currAirlineName = airlineName['AirlineName']
+	findFlights = 'SELECT DISTINCT FlightNumber, DepartureDate, DepartureTime, DepartureAirport, ArrivalDate, ArrivalTime FROM airlinestaff NATURAL JOIN airplane NATURAL JOIN flight WHERE AirlineName = %s ORDER BY DepartureDate ASC'
+	print("airline name", currAirlineName)
+	cursor.execute(findFlights, (currAirlineName))
+	print("here4")
+	data = cursor.fetchall()
+	cursor.close()
+	return render_template('Airline-Staff-View-Flights.html', flights = data)
 
 @app.route('/Airline-Staff-Create')
 def airline_staff_create(): 
