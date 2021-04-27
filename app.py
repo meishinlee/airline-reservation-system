@@ -596,7 +596,9 @@ def view_specific_flight_rating():
 		error = "Flight does not exist, or has no ratings"
 		return render_template('Airline-Staff-View-Flight-Rating.html', flights = data, error = error, flight= flight_number, date = dept_date, time = dept_time)
 
-
+@app.route('/Airline-Staff-View-Agents-Customers')
+def airline_staff_view_people():
+	return render_template('Airline-Staff-View-Agents-Customers.html')
 '''
 #Authenticates the register
 @app.route('/registerAuth', methods=['GET', 'POST'])
