@@ -266,8 +266,7 @@ def bookingAgentViewCustFlightssecond():
 		cursor.execute(query, (username))
 		#stores the results in a variable
 		data1 = cursor.fetchall()
-		print(data1)
-		#if(len(data1) != ()): 
+		print(data1) 
 		#use fetchall() if you are expecting more than 1 data row
 		cursor.close()
 		error = None
@@ -275,7 +274,7 @@ def bookingAgentViewCustFlightssecond():
 	else:
 		data1= ""
 		#print("here error")
-		error = "user does not exist" 
+		error = "User does not exist" 
 		return render_template('Booking-Agent-View-Customer-Flights-second.html', flights = data1, error = error)#, flights=data1, error = error)
 
 
@@ -428,10 +427,10 @@ def airline_staff_view_flights():
 	cursor.execute(findAirlineName, (username))
 	airlineName = cursor.fetchone()
 	currAirlineName = airlineName['AirlineName']
-	findFlights = 'SELECT DISTINCT FlightNumber, DepartureDate, DepartureTime, DepartureAirport, ArrivalDate, ArrivalTime FROM airlinestaff NATURAL JOIN airplane NATURAL JOIN flight WHERE AirlineName = %s ORDER BY DepartureDate ASC'
-	print("airline name", currAirlineName)
+	findFlights = 'SELECT DISTINCT FlightNumber, DepartureDate, DepartureTime, DepartureAirport, ArrivalDate, ArrivalTime FROM airlinestaff NATURAL JOIN flight WHERE AirlineName = %s AND (DepartureDate <= CURRENT_DATE + INTERVAL 30 DAY AND DepartureDate >= CURRENT_DATE AND DepartureTime > CURRENT_TIME) OR (DepartureDate = CURRENT_DATE AND DepartureTime > CURRENT_TIME) ORDER BY DepartureDate ASC'
+	#print("airline name", currAirlineName)
 	cursor.execute(findFlights, (currAirlineName))
-	print("here4")
+	#print("here4")
 	data = cursor.fetchall()
 	cursor.close()
 	return render_template('Airline-Staff-View-Flights.html', flights = data)
@@ -441,42 +440,53 @@ def airline_staff_create():
 	return render_template('Airline-Staff-Create.html')
 
 
-@app.route('/Airline-Staff-Create-Flight')
+@app.route('/Airline-Staff-Create-Flight', methods = ['GET', 'POST'])
 def airline_staff_create_flight(): 
-	airline_name = request.form[""]
-	flight_number = request.form[""]
-	departure_air = request.form[""]
-	departure_date = request.form[""]
-	departure_time = request.form[""] #input type = 'time'
-	arrival_air = request.form[""]
-	arrival_date = request.form[""]
-	arrival_time = request.form[""]
-	base_price = request.form[""]
-	airplane_id = request.form[""]
+	airline_name = request.form["fl-airline-name"]
+	flight_number = request.form["fl-flight-number"]
+	departure_air = request.form["fl-dept-airport"]
+	departure_date = request.form["fl-dept-date"]
+	departure_time = request.form["fl-dept-time"] #input type = 'time'
+	arrival_air = request.form["fl-arr-airport"]
+	arrival_date = request.form["fl-arr-date"]
+	arrival_time = request.form["fl-arr-time"]
+	base_price = request.form["price"]
+	airplane_id = request.form["fl-airplane-id"]
 	
 	#primary key for flight is deptDate, deptTime, flightNum
 	cursor = conn.cursor() 
 	noExistFlight = 'SELECT * FROM flight WHERE FlightNumber = %s AND DepartureDate = %s AND DepartureTime = %s'
-	cursor.execute(noExistFlight, (departure_date, departure_time, flight_number))
+	cursor.execute(noExistFlight, (flight_number, departure_date, departure_time))
 	data = cursor.fetchone()
+
 	if(data): #if exists
 		error = "Flight not added. Flight Already Exists"
-		return render_template('Booking-Agent-Home.html')
+		return render_template('Failure.html', error = error)
 	else: 
 		ins = 'INSERT INTO flight VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-		cursor.execute(ins, (airline_name, departure_date, departure_time, flight_number, departure_air, arrival_air, arrival_time, arrival_date, base_price, airplane_id))
+		cursor.execute(ins, (airline_name, departure_date, departure_time, flight_number, departure_air, arrival_air, arrival_date, arrival_time, base_price, airplane_id))
+		conn.commit()
+		insArrives = 'INSERT INTO arrives VALUES (%s, %s, %s, %s)'
+		cursor.execute(insArrives, (arrival_air, flight_number, departure_date, departure_time))
+		conn.commit() 
+		insDeparts = 'INSERT INTO departs VALUES (%s, %s, %s, %s)'
+		cursor.execute(insDeparts, (departure_air, flight_number, departure_date, departure_time))
+		conn.commit()
+		username = session['username']
+		insUpdates = 'INSERT INTO updates VALUES (%s, %s, %s, %s, %s)'
+		cursor.execute(insUpdates, (username, flight_number, departure_date, departure_time, 'On Time'))
 		conn.commit()
 		cursor.close()
 		error = "Flight successfully added."
-		return render_template('Booking-Agent-Home.html')
+		return render_template('Success.html', error = error)
 
-@app.route('/Update-Flight-Status')
+@app.route('/Update-Flight-Status', methods = ['GET', 'POST'])
 def update_flight_status():
 	username = session['username'] 
-	flight_number = request.form['']
-	departure_date = request.form['']
-	departure_time = request.form['']
-	flight_status = request.form['']
+	flight_number = request.form['up-flight-number']
+	departure_date = request.form['up-dept-date']
+	departure_time = request.form['up-dept-time']
+	flight_status = request.form['up-flight-status']
 
 	cursor = conn.cursor()
 	flightExists = 'SELECT * FROM updates WHERE FlightNumber = %s AND DepartureDate = %s AND DepartureTime = %s'
@@ -485,19 +495,19 @@ def update_flight_status():
 	if(data): 
 		updateFlight = 'UPDATE updates SET FlightStatus = %s, Username = %s WHERE FlightNumber = %s AND DepartureDate = %s AND DepartureTime = %s'
 		cursor.execute(updateFlight, (flight_status, username, flight_number, departure_date, departure_time))
-		cursor.commit() 
+		conn.commit() 
 		cursor.close()
 		error = "Flight Status Updated Successfully"
-		return render_template("Booking-Agent-Home.html")
+		return render_template("Success.html", error = error)
 	else: 
 		error = 'Update Flight Status Failed. Flight does not exist'
-		return render_template("Booking-Agent-Home.html")
+		return render_template("Failure.html", error = error)
 
-@app.route('/Add-Airplane')
+@app.route('/Add-Airplane', methods = ['GET', 'POST'])
 def add_airplane(): 
-	airline_name = request.form['']
-	airplane_id = request.form['']
-	num_seats = request.form['']
+	airline_name = request.form['air-airline-name']
+	airplane_id = request.form['air-airplane-ID']
+	num_seats = request.form['air-num-seats']
 
 	cursor = conn.cursor() 
 	airplaneDNE = 'SELECT * FROM airplane WHERE AirlineName = %s AND AirplaneID = %s'
@@ -505,19 +515,19 @@ def add_airplane():
 	data = cursor.fetchone()
 	if(data): 
 		error = 'Airplane not added. Airplane already exists'
-		return render_template('Booking-Agent-Home.html')
+		return render_template('Failure.html', error=error)
 	else: 
 		addAirplane = 'INSERT INTO airplane VALUES(%s, %s, %s)'
-		cursor.execute(addAirplane, (airline_name, airplane_id, num_seats))
-		cursor.commit()
+		cursor.execute(addAirplane, (airplane_id, airline_name, num_seats))
+		conn.commit()
 		cursor.close()
 		error = "Airplane added successfully"
-		return render_template('Booking-Agent-Home.html')
+		return render_template('Success.html', error = error)
 
-@app.route('/Add-Airport')
+@app.route('/Add-Airport', methods = ['GET', 'POST'])
 def add_airport(): 
-	airport_name = request.form['']
-	airport_city = request.form['']
+	airport_name = request.form['airport-name']
+	airport_city = request.form['airport-city']
 
 	cursor = conn.cursor()
 	airportDNE = 'SELECT * FROM airport WHERE AirportName = %s'
@@ -525,14 +535,67 @@ def add_airport():
 	data = cursor.fetchone()
 	if(data): 
 		error = 'Airport not added. Airport already exists'
-		return render_template('Airline-Staff-Home.html')
+		return render_template('Failure.html', error = error)
 	else: 
 		addAirport = 'INSERT INTO airport VALUES(%s, %s)'
 		cursor.execute(addAirport, (airport_name, airport_city))
-		cursor.commit()
+		conn.commit()
 		cursor.close()
 		error = 'Airport successfully added'
-		return render_template('Airline-Staff-Home.html')
+		return render_template('Success.html', error = error)
+
+@app.route('/Airline-Staff-Rating-Destination-Revenue')
+def rate_dest_rev():
+	username = session['username']
+	cursor = conn.cursor()
+	getAirlineName = 'SELECT AirlineName FROM airlinestaff WHERE username = %s'
+	cursor.execute(getAirlineName, (username))
+	airline_name = cursor.fetchone()
+	getAvgRatings = 'SELECT AirlineName, FlightNumber, DepartureDate, DepartureTime, AVG(Rate) as averageRating FROM suggested NATURAL JOIN Flight WHERE AirlineName = %s GROUP BY AirlineName, FlightNumber, DepartureDate, DepartureTime' 
+	cursor.execute(getAvgRatings, (airline_name['AirlineName']))
+	avgRatings = cursor.fetchall()
+	conn.commit()
+
+	getTopThreeDest = 'SELECT AirportCity FROM ticket NATURAL JOIN purchasedfor NATURAL JOIN flight INNER JOIN airport ON arrivalAirport = airport.AirportName WHERE AirlineName = %s AND arrivalDate >= CURRENT_DATE - INTERVAL 3 MONTH  GROUP BY AirportName ORDER BY COUNT(airportName) DESC LIMIT 3'
+	cursor.execute(getTopThreeDest, (airline_name['AirlineName']))
+	topThreeDests = cursor.fetchall()
+	conn.commit() 
+	if len(topThreeDests) < 3: 
+		n1 = len(topThreeDests)
+	else: 
+		n1 = 3
+
+	getTopDestYear = 'SELECT AirportCity FROM ticket NATURAL JOIN purchasedfor NATURAL JOIN flight INNER JOIN airport ON arrivalAirport = airport.AirportName WHERE AirlineName = %s AND arrivalDate >= CURRENT_DATE - INTERVAL 1 YEAR GROUP BY AirportName ORDER BY COUNT(airportName) DESC LIMIT 3'
+	cursor.execute(getTopDestYear, (airline_name['AirlineName']))
+	topDestYear = cursor.fetchall()
+	conn.commit()
+	cursor.close()
+	if len(topDestYear) < 3: 
+		n2 = len(topDestYear)
+	else: 
+		n2 = 3
+	return render_template('Airline-Staff-Rating-Destination-Revenue.html', avgRatings = avgRatings, topThreeDests = topThreeDests, n1 = int(n1), n2 = int(n2), topDestYear = topDestYear)
+
+@app.route('/Airline-Staff-View-Flight-Rating', methods = ['GET', 'POST'])
+def view_specific_flight_rating(): 
+	flight_number = request.form['flight-number']
+	dept_date = request.form['dept-date']
+	dept_time = request.form['dept-time']
+	print("hi")
+	cursor = conn.cursor()
+	getFlightRatingComments = 'SELECT Rate, CustomerComment FROM suggested WHERE FlightNumber = %s AND DepartureDate = %s AND DepartureTime = %s'
+	cursor.execute(getFlightRatingComments, (flight_number, dept_date, dept_time))
+	data = cursor.fetchall()
+	print("Fetched Data")
+	if(data): 
+		print("ifdata")
+		return render_template('Airline-Staff-View-Flight-Rating.html', flights = data, flight = flight_number, date = dept_date, time = dept_time)
+	else: 
+		print("nodata")
+		data = ""
+		error = "Flight does not exist, or has no ratings"
+		return render_template('Airline-Staff-View-Flight-Rating.html', flights = data, error = error, flight= flight_number, date = dept_date, time = dept_time)
+
 
 '''
 #Authenticates the register

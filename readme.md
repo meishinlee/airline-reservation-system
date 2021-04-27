@@ -18,13 +18,13 @@ Finished:
 Concerns: 
 - Passport number duplicates in database despite different email IDs? 
 - phone number can't exceed 2^10? 
-- I want the customer login name instead of the username to display on welcome page
 - Forgot to add a row in purchased for (ticket 1)
+- How to add foreign key for Flight-AirplaneID to Airplane-AirplaneID??**
 
 In Progress: 
 - Search flight - need query and need table designs. -> make 2 webpages here  
     - Perform another search, back to home. 
-- Customer Homepage (Mei), finished design, didn't link the page 
+- Customer Homepage (Mei), finished 
     - View my Flights (Finished)
     - Search flights/Purchase Tickets (linked to customer home page, but whats a round trip)? 
     - Rate/Comment (finished). Added additional constraint where I checked for no dup ratings 
@@ -38,15 +38,15 @@ In Progress:
     - Logout (finished)
 - Airline Staff Homepage 
     - View flights 
-    - Create flights <--By default should i have a 'On time' Flight status (updates table)?
-    - Update stuff (change flight status, add airplane, add airport)
+    - Create flights (done)<--By default should i have a 'On time' Flight status (updates table)?
+    - Update stuff (done)
     - Logout (Finished)
-    - View ratings
-    - View top 5 booking agents by commission
+    - View ratings View Ratings of Flight done. Only thing not done here is revenue (Pie chart)
+    - View top 5 booking agents by commission (not done)
     - View most frequent customer, list of flights a particular customer has taken on that airline 
-    - View reports 
+    - View reports (Chart)
 
-
+Flight 6 and 7 are round trips. Everything else is one way 
 
 To Do: 
 - Search Flights - with customer  
