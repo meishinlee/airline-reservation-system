@@ -8,7 +8,7 @@
     <meta name="page_type" content="np-template-header-footer-from-plugin">
     <title>agents customers</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/nicepage.css') }}" media="screen">
-    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/Airline-Staff-View-Agents-Customers.css') }}" media="screen">
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/Airline-Staff-Top-Agents-Frequent-Customers.css') }}" media="screen">
         <script class="u-script" type="text/javascript" src="{{ url_for('static', filename='scripts/jquery.js') }}" defer=""></script>
         <script class="u-script" type="text/javascript" src="{{ url_for('static', filename='scripts/nicepage.js') }}" defer=""></script>
     <meta name="generator" content="Nicepage 3.12.1, nicepage.com">
@@ -60,8 +60,8 @@
               </tr>
               <tr style="height: 67px;">
                 <td class="u-table-cell">1</td>
-                <td class="u-table-cell"></td>
-                <td class="u-table-cell"></td>
+                <td class="u-table-cell">{{topAgentMonth['AgentEmail']}}</td>
+                <td class="u-table-cell">{{topAgentMonth['ticketSold']}}</td>
               </tr>
             </tbody>
           </table>
@@ -86,8 +86,8 @@
               </tr>
               <tr style="height: 67px;">
                 <td class="u-table-cell">1</td>
-                <td class="u-table-cell"></td>
-                <td class="u-table-cell"></td>
+                <td class="u-table-cell">{{topAgentYear['AgentEmail']}}</td>
+                <td class="u-table-cell">{{topAgentYear['ticketSold']}}</td>
               </tr>
             </tbody>
           </table>
@@ -176,7 +176,7 @@
     </section>
     <section class="u-align-center u-clearfix u-palette-2-light-2 u-section-9" id="sec-d4f2">
       <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
-        <a href="http://127.0.0.1:5000/Airline-Staff-View-Agents-Customers" class="u-active-palette-2-base u-border-2 u-border-active-grey-75 u-border-grey-75 u-border-hover-grey-75 u-btn u-btn-rectangle u-button-style u-color-scheme-summer-time u-color-style-multicolor-1 u-hover-palette-2-base u-none u-radius-0 u-text-active-white u-text-hover-white u-text-white u-btn-1">Back to Homepage</a>
+        <a href="http://127.0.0.1:5000/Airline-Staff-Home" class="u-active-palette-2-base u-border-2 u-border-active-grey-75 u-border-grey-75 u-border-hover-grey-75 u-btn u-btn-rectangle u-button-style u-color-scheme-summer-time u-color-style-multicolor-1 u-hover-palette-2-base u-none u-radius-0 u-text-active-white u-text-hover-white u-text-white u-btn-1">Back to Homepage</a>
       </div>
     </section>
     

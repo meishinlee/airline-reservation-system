@@ -324,6 +324,11 @@ def topCusts():
 		for key in elem: 
 			labels.append(elem[key])
 	print(labels)
+	#labels = [
+    #'JAN', 'FEB', 'MAR', 'APR',
+    #'MAY', 'JUN', 'JUL', 'AUG',
+    #'SEP', 'OCT', 'NOV222', 'DEC']
+
 	topCustsy = 'SELECT SUM(CommissionAmount) AS commission FROM customer NATURAL JOIN ticket NATURAL JOIN creates WHERE agentemail = %s GROUP BY customerEmail ORDER BY commission DESC LIMIT 5'
 	cursor.execute(topCustsy, (username))
 	datay = cursor.fetchall()
@@ -334,7 +339,13 @@ def topCusts():
 	print(values)
 	cursor.close()
 	print(datay)
-	return render_template('Top-Customers.html', labels = labels, values = values, title = "Top Customers")
+	#values = [
+    #967.67, 1190.89, 1079.75, 1349.19,
+    #2328.91, 2504.28, 2873.83, 4764.87,
+    #4349.29, 6458.30, 9907, 16297
+    #]
+
+	return render_template('topcustomers.html',  title='Top Customers by Commission', max=50, labels=labels, values=values)
 
 @app.route('/View-Commissions')
 def view_commissions_main(): 
@@ -450,6 +461,19 @@ def airline_staff_view_flights():
 	data = cursor.fetchall()
 	cursor.close()
 	return render_template('Airline-Staff-View-Flights.html', flights = data)
+
+@app.route('/Airline-Staff-Top-Agents-Frequent-Customers')
+def top_agent_frequent_cust(): 
+	cursor = conn.cursor()
+	findTopAgentMonth = 'SELECT AgentEmail, COUNT(*) AS ticketSold FROM ticket NATURAL JOIN creates WHERE puchaseDate >= CURRENT_DATE - INTERVAL 1 MONTH GROUP BY AgentEmail ORDER BY COUNT(AgentID) DESC'
+	cursor.execute(findTopAgentMonth)
+	topAgentMonth = cursor.fetchone()
+	#print(topAgent)
+	findTopAgentYear = 'SELECT AgentEmail, COUNT(*) AS ticketSold FROM ticket NATURAL JOIN creates WHERE puchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR GROUP BY AgentEmail ORDER BY COUNT(AgentID) DESC'
+	cursor.execute(findTopAgentYear)
+	topAgentYear = cursor.fetchone()
+	cursor.close()
+	return render_template('Airline-Staff-Top-Agents-Frequent-Customers.html', topAgentMonth = topAgentMonth, topAgentYear = topAgentYear)
 
 @app.route('/Airline-Staff-Create')
 def airline_staff_create(): 
@@ -612,10 +636,12 @@ def view_specific_flight_rating():
 		error = "Flight does not exist, or has no ratings"
 		return render_template('Airline-Staff-View-Flight-Rating.html', flights = data, error = error, flight= flight_number, date = dept_date, time = dept_time)
 
+
+'''
 @app.route('/Airline-Staff-View-Agents-Customers')
 def airline_staff_view_people():
 	return render_template('Airline-Staff-View-Agents-Customers.html')
-'''
+
 #Authenticates the register
 @app.route('/registerAuth', methods=['GET', 'POST'])
 def registerAuth():
