@@ -313,12 +313,28 @@ def bookingAgentRegisterAuth():
 def topCusts(): 
 	username = session['username']
 	cursor = conn.cursor()
-	topCusts = 'SELECT customerEmail, SUM(CommissionAmount) AS commission FROM customer NATURAL JOIN ticket NATURAL JOIN creates WHERE agentemail = %s GROUP BY customerEmail ORDER BY commission DESC LIMIT 5'
-	cursor.execute(topCusts, (username))
-	data = cursor.fetchall()
+	#topCusts = 'SELECT customerEmail, SUM(CommissionAmount) AS commission FROM customer NATURAL JOIN ticket NATURAL JOIN creates WHERE agentemail = %s GROUP BY customerEmail ORDER BY commission DESC LIMIT 5'
+	topCustsx = 'SELECT customerEmail FROM customer NATURAL JOIN ticket NATURAL JOIN creates WHERE agentemail = %s GROUP BY customerEmail ORDER BY SUM(CommissionAmount) DESC LIMIT 5'
+	cursor.execute(topCustsx, (username))
+	datax = cursor.fetchall()
 	print(username)
+	print(datax)
+	labels = [] 
+	for elem in datax: 
+		for key in elem: 
+			labels.append(elem[key])
+	print(labels)
+	topCustsy = 'SELECT SUM(CommissionAmount) AS commission FROM customer NATURAL JOIN ticket NATURAL JOIN creates WHERE agentemail = %s GROUP BY customerEmail ORDER BY commission DESC LIMIT 5'
+	cursor.execute(topCustsy, (username))
+	datay = cursor.fetchall()
+	values = [] 
+	for elem in datay: 
+		for key in elem: 
+			values.append(elem[key])
+	print(values)
 	cursor.close()
-	return render_template('Top-Customers.html', topCusts = data)
+	print(datay)
+	return render_template('Top-Customers.html', labels = labels, values = values, title = "Top Customers")
 
 @app.route('/View-Commissions')
 def view_commissions_main(): 
