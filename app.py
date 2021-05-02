@@ -469,7 +469,63 @@ def view_flights_custom_date():
 		error = "No flights found"
 		return render_template('Airline-Staff-View-Flights-Custom.html', flights = data, error = error)
 
+@app.route('/Airline-Staff-View-Flights-Custom-City',methods = ['GET','POST'])
+def view_flights_custom_city(): 
+	city = request.form['city-name']
+	username = session['username']
+	cursor = conn.cursor()
+	findAirlineName = 'SELECT AirlineName FROM airlinestaff WHERE Username = %s'
+	cursor.execute(findAirlineName, (username))
+	airlineName = cursor.fetchone()['AirlineName']
+	findFlights = 'SELECT FlightNumber, DepartureDate, DepartureTime FROM flight AS f INNER JOIN airport AS a ON f.ArrivalAirport = a.AirportName WHERE airlineName = %s AND airportCity = %s ORDER BY arrivalDate'
+	cursor.execute(findFlights, (airlineName, city))
+	data = cursor.fetchall()
+	cursor.close()
+	if data: 
+		return render_template('Airline-Staff-View-Flights-Custom.html', flights = data)
+	else: 
+		error = "No flights found"
+		return render_template('Airline-Staff-View-Flights-Custom.html', flights = data, error = error)
 
+@app.route('/Airline-Staff-View-Flights-Custom-Source-Airport', methods = ['GET', 'POST'])
+def view_flights_source_airport(): 
+	source_airport = request.form['source-airport']
+	username = session['username']
+	cursor = conn.cursor()
+	findAirlineName = 'SELECT AirlineName FROM airlinestaff WHERE Username = %s'
+	cursor.execute(findAirlineName, (username))
+	airlineName = cursor.fetchone()['AirlineName']
+	findSourceAirport = 'SELECT FlightNumber, DepartureDate, DepartureTime FROM flight WHERE airlineName = %s AND DepartureAirport = %s'
+	cursor.execute(findSourceAirport, (airlineName, source_airport))
+	data = cursor.fetchall()
+	cursor.close()
+	if data: 
+		return render_template('Airline-Staff-View-Flights-Custom.html', flights = data)
+	else: 
+		error = "No flights found"
+		return render_template('Airline-Staff-View-Flights-Custom.html', flights = data, error = error)
+
+@app.route('/Airline-Staff-View-Flights-Custom-Destination-Airport', methods = ['GET', 'POST'])
+def view_flights_destination_airport(): 
+	destination_airport = request.form['destination-airport']
+	username = session['username']
+	cursor = conn.cursor()
+	findAirlineName = 'SELECT AirlineName FROM airlinestaff WHERE Username = %s'
+	cursor.execute(findAirlineName, (username))
+	airlineName = cursor.fetchone()['AirlineName']
+	findDestinationAirport = 'SELECT FlightNumber, DepartureDate, DepartureTime FROM flight WHERE airlineName = %s AND ArrivalAirport = %s'
+	cursor.execute(findDestinationAirport, (airlineName, destination_airport))
+	data = cursor.fetchall()
+	cursor.close()
+	if data: 
+		return render_template('Airline-Staff-View-Flights-Custom.html', flights = data)
+	else: 
+		error = "No flights found"
+		return render_template('Airline-Staff-View-Flights-Custom.html', flights = data, error = error)
+
+@app.route('/Airline-Staff-View-Flights-Customers')
+def airline_staff_view_flight_customers(): 
+	return 
 
 @app.route('/Airline-Staff-Top-Agents-Frequent-Customers')
 def top_agent_frequent_cust(): 
@@ -477,7 +533,6 @@ def top_agent_frequent_cust():
 	findTopAgentMonth = 'SELECT AgentEmail, COUNT(*) AS ticketSold FROM ticket NATURAL JOIN creates WHERE puchaseDate >= CURRENT_DATE - INTERVAL 1 MONTH GROUP BY AgentEmail ORDER BY COUNT(AgentID) DESC LIMIT 5'
 	cursor.execute(findTopAgentMonth)
 	topAgentMonth = cursor.fetchall()
-	#print(topAgent)
 	findTopAgentYear = 'SELECT AgentEmail, COUNT(*) AS ticketSold FROM ticket NATURAL JOIN creates WHERE puchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR GROUP BY AgentEmail ORDER BY COUNT(AgentID) DESC LIMIT 5'
 	cursor.execute(findTopAgentYear)
 	topAgentYear = cursor.fetchall()

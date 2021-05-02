@@ -31,22 +31,33 @@ In Progress:
     - Track Spending (didn't start idk how to make a barchart) !!!
     - Logout (finished)
 - Booking Agent Homepage 
-    - View my Flights (ERROR NOT SHOWING WHEN CUSTOMER NOT FOUND), finished otherwise 
+    - View my Flights (finished)
     - Search my Flights/Purchase Tickets (Have not Started)
     - View my Commissions (Finished)
-    - Top 5 Customers (Maybe DONE? Check)
+    - Top 5 Customers (DONE, but need to add more customers for test case)
     - Logout (finished)
 - Airline Staff Homepage 
-    - View flights <- Custom date (done)
+    - View flights <- All done except view flight customers
     - Create flights (done)<--By default should i have a 'On time' Flight status (updates table)?
     - Update stuff (done)
     - Logout (Finished)
     - View ratings View Ratings of Flight done. Only thing not done here is revenue (Pie chart)
     - View top 5 booking agents by commission (Done)
     - View most frequent customer, list of flights a particular customer has taken on that airline (Done)
-    - View reports (Chart)
+    - View reports (Chart) NOT DONE 
 
 Flight 6 and 7 are round trips. Everything else is one way 
+
+Total Not done: 
+Customer: 
+    - Search Flight Table (design) + Purchase
+    - Track Spending Chart
+Booking Agent: 
+    - Search Flights + Purchase Tickets
+Airline Staff: 
+    - View Flights <- Customers on a flight
+    - View Revenue Chart
+    - View Reports 
 
 To Do: 
 - Search Flights - with customer  
