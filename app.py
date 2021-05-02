@@ -309,7 +309,7 @@ def bookingAgentRegisterAuth():
 		cursor.close()
 		return render_template('index.html')
 
-@app.route('/Top-Customers')
+@app.route('/Booking-Agent-Top-Customers')
 def topCusts(): 
 	username = session['username']
 	cursor = conn.cursor()
@@ -324,10 +324,6 @@ def topCusts():
 		for key in elem: 
 			labels.append(elem[key])
 	print(labels)
-	#labels = [
-    #'JAN', 'FEB', 'MAR', 'APR',
-    #'MAY', 'JUN', 'JUL', 'AUG',
-    #'SEP', 'OCT', 'NOV222', 'DEC']
 
 	topCustsy = 'SELECT SUM(CommissionAmount) AS commission FROM customer NATURAL JOIN ticket NATURAL JOIN creates WHERE agentemail = %s GROUP BY customerEmail ORDER BY commission DESC LIMIT 5'
 	cursor.execute(topCustsy, (username))
@@ -339,13 +335,7 @@ def topCusts():
 	print(values)
 	cursor.close()
 	print(datay)
-	#values = [
-    #967.67, 1190.89, 1079.75, 1349.19,
-    #2328.91, 2504.28, 2873.83, 4764.87,
-    #4349.29, 6458.30, 9907, 16297
-    #]
-
-	return render_template('topcustomers.html',  title='Top Customers by Commission', max=50, labels=labels, values=values)
+	return render_template('Booking-Agent-Top-Customers.html',  title='Top Customers by Commission', max=50, labels=labels, values=values)
 
 @app.route('/View-Commissions')
 def view_commissions_main(): 
@@ -454,26 +444,74 @@ def airline_staff_view_flights():
 	cursor.execute(findAirlineName, (username))
 	airlineName = cursor.fetchone()
 	currAirlineName = airlineName['AirlineName']
-	findFlights = 'SELECT DISTINCT FlightNumber, DepartureDate, DepartureTime, DepartureAirport, ArrivalDate, ArrivalTime FROM airlinestaff NATURAL JOIN flight WHERE AirlineName = %s AND (DepartureDate <= CURRENT_DATE + INTERVAL 30 DAY AND DepartureDate >= CURRENT_DATE AND DepartureTime > CURRENT_TIME) OR (DepartureDate = CURRENT_DATE AND DepartureTime > CURRENT_TIME) ORDER BY DepartureDate ASC'
-	#print("airline name", currAirlineName)
+	findFlights = 'SELECT DISTINCT FlightNumber, DepartureDate, DepartureTime, DepartureAirport, ArrivalDate, ArrivalTime FROM airlinestaff NATURAL JOIN flight WHERE AirlineName = %s AND (DepartureDate <= CURRENT_DATE + INTERVAL 30 DAY AND (DepartureDate > CURRENT_DATE)) OR (DepartureDate = CURRENT_DATE AND DepartureTime > CURRENT_TIME) ORDER BY DepartureDate ASC'
 	cursor.execute(findFlights, (currAirlineName))
-	#print("here4")
 	data = cursor.fetchall()
 	cursor.close()
 	return render_template('Airline-Staff-View-Flights.html', flights = data)
 
+@app.route('/Airline-Staff-View-Flights-Custom-Date', methods = ['GET','POST'])
+def view_flights_custom_date(): 
+	start_date = request.form['start-date']
+	end_date = request.form['end-date']
+	cursor = conn.cursor() 
+	username = session['username']
+	findAirlineName = 'SELECT AirlineName FROM airlinestaff WHERE Username = %s'
+	cursor.execute(findAirlineName, (username))
+	airlineName = cursor.fetchone()['AirlineName']
+	findFlights = 'SELECT FlightNumber, DepartureDate, DepartureTime FROM flight WHERE airlineName = %s AND DepartureDate > %s AND DepartureDate < %s'
+	cursor.execute(findFlights, (airlineName, start_date, end_date))
+	data = cursor.fetchall()
+	cursor.close()
+	if (data): 
+		return render_template('Airline-Staff-View-Flights-Custom.html', flights = data)
+	else: 
+		error = "No flights found"
+		return render_template('Airline-Staff-View-Flights-Custom.html', flights = data, error = error)
+
+
+
 @app.route('/Airline-Staff-Top-Agents-Frequent-Customers')
 def top_agent_frequent_cust(): 
 	cursor = conn.cursor()
-	findTopAgentMonth = 'SELECT AgentEmail, COUNT(*) AS ticketSold FROM ticket NATURAL JOIN creates WHERE puchaseDate >= CURRENT_DATE - INTERVAL 1 MONTH GROUP BY AgentEmail ORDER BY COUNT(AgentID) DESC'
+	findTopAgentMonth = 'SELECT AgentEmail, COUNT(*) AS ticketSold FROM ticket NATURAL JOIN creates WHERE puchaseDate >= CURRENT_DATE - INTERVAL 1 MONTH GROUP BY AgentEmail ORDER BY COUNT(AgentID) DESC LIMIT 5'
 	cursor.execute(findTopAgentMonth)
-	topAgentMonth = cursor.fetchone()
+	topAgentMonth = cursor.fetchall()
 	#print(topAgent)
-	findTopAgentYear = 'SELECT AgentEmail, COUNT(*) AS ticketSold FROM ticket NATURAL JOIN creates WHERE puchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR GROUP BY AgentEmail ORDER BY COUNT(AgentID) DESC'
+	findTopAgentYear = 'SELECT AgentEmail, COUNT(*) AS ticketSold FROM ticket NATURAL JOIN creates WHERE puchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR GROUP BY AgentEmail ORDER BY COUNT(AgentID) DESC LIMIT 5'
 	cursor.execute(findTopAgentYear)
-	topAgentYear = cursor.fetchone()
+	topAgentYear = cursor.fetchall()
+	findTopAgentComsYear = 'SELECT AgentEmail, SUM(commissionAmount) AS commission FROM ticket NATURAL JOIN creates WHERE puchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR GROUP BY AgentEmail ORDER BY commission DESC LIMIT 5'
+	cursor.execute(findTopAgentComsYear)
+	topAgentYearComs = cursor.fetchall()
+	username = session['username']
+	staffAirline = 'SELECT AirlineName FROM airlinestaff WHERE username = %s'
+	cursor.execute(staffAirline, (username))
+	staffAirlineName = cursor.fetchone()['AirlineName']
+	print(staffAirlineName)
+	findTopCustomer = 'SELECT CustomerEmail, COUNT(*) AS numFlights FROM ticket WHERE AirlineName = %s GROUP BY CustomerEmail ORDER BY numFlights DESC LIMIT 1'
+	cursor.execute(findTopCustomer, (staffAirlineName))
+	topCustomer = cursor.fetchone()
 	cursor.close()
-	return render_template('Airline-Staff-Top-Agents-Frequent-Customers.html', topAgentMonth = topAgentMonth, topAgentYear = topAgentYear)
+	return render_template('Airline-Staff-Top-Agents-Frequent-Customers.html', topAgentMonth = topAgentMonth, topAgentYear = topAgentYear, topAgentYearComs = topAgentYearComs, topCustomer = topCustomer)
+
+@app.route('/Airline-Staff-View-Customer-Flights', methods = ["GET", 'POST'])
+def airline_staff_view_cust_flights(): 
+	custEmail = request.form["customer-email"]
+	cursor = conn.cursor()
+	username = session['username']
+	staffAirline = 'SELECT AirlineName FROM airlinestaff WHERE username = %s'
+	cursor.execute(staffAirline, (username))
+	staffAirlineName = cursor.fetchone()['AirlineName']
+	getFlights = 'SELECT FlightNumber, DepartureDate, DepartureTime FROM Flight NATURAL JOIN updates NATURAL JOIN purchasedfor NATURAL JOIN ticket NATURAL JOIN customer WHERE CustomerEmail = %s AND airlineName = %s ORDER BY DepartureDate'
+	cursor.execute(getFlights, (custEmail, staffAirlineName))
+	custFlights = cursor.fetchall()
+	cursor.close()
+	if custFlights: 
+		return render_template('Airline-Staff-View-Customer-Flights.html', custFlights = custFlights, custEmail = custEmail)
+	else: 
+		error = "Customer Not Found, please go back to homepage"
+		return render_template('Airline-Staff-View-Customer-Flights.html', error = error)
 
 @app.route('/Airline-Staff-Create')
 def airline_staff_create(): 

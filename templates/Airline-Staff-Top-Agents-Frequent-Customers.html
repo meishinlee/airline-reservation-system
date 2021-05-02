@@ -44,7 +44,7 @@
     </section>
     <section class="u-align-center u-clearfix u-section-2" id="carousel_3afa">
       <div class="u-clearfix u-sheet u-sheet-1">
-        <h4 class="u-custom-font u-font-oswald u-text u-text-1">Last Month's Performance</h4>
+        <h4 class="u-custom-font u-font-oswald u-text u-text-1">Last Month's Performance (Most Tickets)</h4>
         <div class="u-table u-table-responsive u-table-1">
           <table class="u-table-entity">
             <colgroup>
@@ -54,15 +54,17 @@
             </colgroup>
             <tbody class="u-table-alt-palette-2-light-3 u-table-body u-table-body-1">
               <tr style="height: 67px;">
-                <td class="u-table-cell u-table-cell-1">Ranking</td>
+                <!--<td class="u-table-cell u-table-cell-1">Ranking</td>-->
                 <td class="u-table-cell u-table-cell-2">Agent's Email</td>
                 <td class="u-table-cell">Tickets Sold</td>
               </tr>
+              {%for line in topAgentMonth %}
               <tr style="height: 67px;">
-                <td class="u-table-cell">1</td>
-                <td class="u-table-cell">{{topAgentMonth['AgentEmail']}}</td>
-                <td class="u-table-cell">{{topAgentMonth['ticketSold']}}</td>
+                <!--<td class="u-table-cell">1</td>-->
+                <td class="u-table-cell">{{line['AgentEmail']}}</td>
+                <td class="u-table-cell">{{line['ticketSold']}}</td>
               </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
@@ -70,7 +72,7 @@
     </section>
     <section class="u-align-center u-clearfix u-section-3" id="carousel_7d22">
       <div class="u-clearfix u-sheet u-sheet-1">
-        <h4 class="u-custom-font u-font-oswald u-text u-text-1">Last Year's Performance</h4>
+        <h4 class="u-custom-font u-font-oswald u-text u-text-1">Last Year's Performance (Most Tickets)</h4>
         <div class="u-table u-table-responsive u-table-1">
           <table class="u-table-entity">
             <colgroup>
@@ -80,15 +82,17 @@
             </colgroup>
             <tbody class="u-table-alt-palette-2-light-3 u-table-body u-table-body-1">
               <tr style="height: 67px;">
-                <td class="u-table-cell u-table-cell-1">Ranking</td>
+                <!--<td class="u-table-cell u-table-cell-1">Ranking</td>-->
                 <td class="u-table-cell u-table-cell-2">Agent's Email</td>
                 <td class="u-table-cell">Tickets Sold</td>
               </tr>
+              {%for line in topAgentYear %}
               <tr style="height: 67px;">
-                <td class="u-table-cell">1</td>
-                <td class="u-table-cell">{{topAgentYear['AgentEmail']}}</td>
-                <td class="u-table-cell">{{topAgentYear['ticketSold']}}</td>
+                <!--<td class="u-table-cell">1</td> -->
+                <td class="u-table-cell">{{line['AgentEmail']}}</td>
+                <td class="u-table-cell">{{line['ticketSold']}}</td>
               </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
@@ -106,15 +110,17 @@
             </colgroup>
             <tbody class="u-table-alt-palette-2-light-3 u-table-body u-table-body-1">
               <tr style="height: 67px;">
-                <td class="u-table-cell u-table-cell-1">Ranking</td>
+                <!--<td class="u-table-cell u-table-cell-1">Ranking</td>-->
                 <td class="u-table-cell u-table-cell-2">Agent's Email</td>
                 <td class="u-table-cell">Tickets Sold</td>
               </tr>
+              {%for line in topAgentYearComs %}
               <tr style="height: 67px;">
-                <td class="u-table-cell">1</td>
-                <td class="u-table-cell"></td>
-                <td class="u-table-cell"></td>
+                <!--<td class="u-table-cell">1</td>-->
+                <td class="u-table-cell">{{line['AgentEmail']}}</td>
+                <td class="u-table-cell">{{line['commission']}}</td>
               </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
@@ -136,14 +142,12 @@
             </colgroup>
             <tbody class="u-table-alt-palette-2-light-3 u-table-body u-table-body-1">
               <tr style="height: 69px;">
-                <td class="u-table-cell u-table-cell-1">Customer's Name</td>
                 <td class="u-table-cell u-table-cell-2">Customer's Email</td>
                 <td class="u-table-cell">Number of Flights</td>
               </tr>
               <tr style="height: 69px;">
-                <td class="u-table-cell"></td>
-                <td class="u-table-cell"></td>
-                <td class="u-table-cell"></td>
+                <td class="u-table-cell">{{topCustomer['CustomerEmail']}}</td>
+                <td class="u-table-cell">{{topCustomer['numFlights']}}</td>
               </tr>
             </tbody>
           </table>
@@ -152,19 +156,19 @@
     </section>
     <section class="u-align-left u-border-20 u-border-white u-clearfix u-palette-2-light-2 u-section-7" id="sec-6523">
       <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
-        <h1 class="u-align-center u-custom-font u-font-oswald u-text u-text-1">View Customer's Frequent Flights</h1>
+        <h1 class="u-align-center u-custom-font u-font-oswald u-text u-text-1">View Customer's Flights</h1>
       </div>
     </section>
     <section class="u-align-left u-clearfix u-palette-2-light-2 u-section-8" id="carousel_cf26">
       <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
         <div class="u-form u-form-1">
-          <form action="https://nicepage.com" method="POST" class="u-clearfix u-form-custom-backend u-form-horizontal u-form-spacing-15 u-inner-form" style="padding: 15px" source="custom" redirect="true">
+          <form action="/Airline-Staff-View-Customer-Flights" method="POST" class="u-clearfix u-form-custom-backend u-form-horizontal u-form-spacing-15 u-inner-form" style="padding: 15px" source="custom" redirect="true">
             <div class="u-form-email u-form-group u-form-group-1">
               <label for="text-921f" class="u-form-control-hidden u-label"></label>
-              <input type="email" placeholder="Customer's Email" id="text-921f" name="email" class="u-border-1 u-border-grey-75 u-input u-input-rectangle u-palette-2-light-3 u-text-palette-2-dark-2 u-input-1" required="required">
+              <input type="email" placeholder="Customer's Email" id="text-921f" name="customer-email" class="u-border-1 u-border-grey-75 u-input u-input-rectangle u-palette-2-light-3 u-text-palette-2-dark-2 u-input-1" required="required">
             </div>
             <div class="u-form-group u-form-submit">
-              <a href="#" class="u-active-palette-2-light-1 u-border-2 u-border-active-grey-75 u-border-grey-75 u-border-hover-grey-75 u-btn u-btn-submit u-button-style u-hover-palette-2-light-1 u-palette-2-light-2 u-text-active-white u-text-body-alt-color u-text-hover-white u-btn-1">SUBMIT</a>
+              <a href="http://127.0.0.1:5000/Airline-Staff-View-Customer-Flights" class="u-active-palette-2-light-1 u-border-2 u-border-active-grey-75 u-border-grey-75 u-border-hover-grey-75 u-btn u-btn-submit u-button-style u-hover-palette-2-light-1 u-palette-2-light-2 u-text-active-white u-text-body-alt-color u-text-hover-white u-btn-1">SUBMIT</a>
               <input type="submit" value="submit" class="u-form-control-hidden">
             </div>
             <div class="u-form-send-message u-form-send-success">Thank you! Your message has been sent.</div>
