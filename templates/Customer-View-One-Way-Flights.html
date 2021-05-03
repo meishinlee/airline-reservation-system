@@ -31,7 +31,35 @@
   <body class="u-body"><!--<header class="u-clearfix u-header u-header" id="sec-c629"><div class="u-clearfix u-sheet u-sheet-1"></div></header>-->
     <section class="u-align-left u-clearfix u-image u-shading u-section-1" id="carousel_b327">
       <div class="u-clearfix u-sheet u-sheet-1">
-        <h1 class="u-align-center u-custom-font u-font-ubuntu u-text u-text-black u-text-default u-text-1">View Flights</h1>
+        <h1 class="u-align-center u-custom-font u-font-ubuntu u-text u-text-black u-text-default u-text-1">View Flights (with Seats Remaining)</h1>
+        <div class="u-form u-form-1">
+            <form action="/Customer-Purchase-One-Way-Flight" method="POST" class="u-clearfix u-form-custom-backend u-form-spacing-10 u-form-vertical u-inner-form" style="padding: 10px" source="custom" name="form" redirect="true">
+              <input type="hidden" id="siteId" name="siteId" value="270108917">
+              <input type="hidden" id="pageId" name="pageId" value="2840821394">
+              <div class="u-form-group u-form-name">
+                <label for="name-4de5" class="u-form-control-hidden u-label">Flight Number</label>
+                <input type="number" placeholder="Enter flight Number" id="name-4de5" name="flight-number" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" required="">
+              </div>
+              <div class="u-form-group u-form-name">
+                <label for="name-4de5" class="u-form-control-hidden u-label">Departure Date</label>
+                <input type="Date" placeholder="Enter Departure Date" id="name-4de5" name="departure-date" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" required="">
+              </div>
+              <div class="u-form-group u-form-name">
+                <label for="name-4de5" class="u-form-control-hidden u-label">Departure Time</label>
+                <input type="Time" placeholder="Enter Departure Time" id="name-4de5" name="departure-time" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" required="">
+              </div>
+              <div class="u-align-center u-form-group u-form-submit">
+                <a href="http://127.0.0.1:5000/Customer-One-Way-Flight-Search-Results" class="u-btn u-btn-submit u-button-style">Submit</a>
+                <input type="submit" value="submit" class="u-form-control-hidden">
+                {% if error %}
+                     <p style="color:black" class="error"><strong>Error:</strong> {{error}}</p>
+                  {% endif %}
+              </div>
+              <div class="u-form-send-message u-form-send-success"> Thank you! Your message has been sent. </div>
+              <div class="u-form-send-error u-form-send-message"> Unable to send your message. Please fix errors then try again. </div>
+              <input type="hidden" value="" name="recaptchaResponse">
+            </form>
+          </div>
         <div class="u-expanded-width u-table u-table-responsive u-table-1">
           <table class="u-table-entity">
             <colgroup>
@@ -64,7 +92,7 @@
             </tbody>
           </table>
         </div>
-        <a href="http://127.0.0.1:5000/" data-page-id="1909121869" class="u-btn u-btn-round u-button-style u-palette-1-base u-radius-10 u-btn-1">Back to Homepage<br>
+        <a href="http://127.0.0.1:5000/Customer-Home" data-page-id="1909121869" class="u-btn u-btn-round u-button-style u-palette-1-base u-radius-10 u-btn-1">Back to Homepage<br>
         </a>
       </div>
     </section>

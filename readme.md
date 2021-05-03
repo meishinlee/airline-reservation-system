@@ -50,7 +50,7 @@ Flight 6 and 7 are round trips. Everything else is one way
 
 Total Not done: 
 Customer: 
-    - Search Flight Table (design) + Purchase
+    - Search Flight Table (finished for single flights) + Purchase (Linked to flask, but did not insert into DB yet)
     - Track Spending Chart
 Booking Agent: 
     - Search Flights + Purchase Tickets

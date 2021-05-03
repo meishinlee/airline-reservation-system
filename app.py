@@ -180,8 +180,8 @@ def rateFlightAuth():
 @app.route('/View-Flights')
 def viewFlightsPublic():
     #username = session['username']
-    cursor = conn.cursor();
-    query = 'SELECT AirlineName, FlightNumber, DepartureDate, ArrivalDate, FlightStatus FROM Flight AS f NATURAL JOIN updates ORDER BY DepartureDate LIMIT 10'
+    cursor = conn.cursor()
+    query = 'SELECT AirlineName, FlightNumber, DepartureDate, DepartureTime, ArrivalDate, FlightStatus FROM Flight AS f NATURAL JOIN updates ORDER BY DepartureDate'
     cursor.execute(query)
     data1 = cursor.fetchall() 
     for each in data1:
@@ -189,9 +189,87 @@ def viewFlightsPublic():
     cursor.close()
     return render_template('View-Flights.html', flights=data1)
 
-@app.route('/Search-Flights')
+@app.route('/Customer-Search-Purchase-Flights', methods = ['GET', 'POST'])
+def searchCustOneWayFlights(): 
+	'''
+	source_city = request.form['source-city-one']
+	source_air = request.form['source-airport-one']
+	dest_city = request.form['destination-city-one']
+	dest_air = request.form['destination-airport-one']
+	dept_date = request.form['departure-date-one']
+	
+	cursor = conn.cursor()
+	oneWayFlights = 'SELECT AirlineName, FlightNumber, DepartureDate, DepartureTime, ArrivalDate, FlightStatus FROM Flight AS f NATURAL JOIN updates INNER JOIN airport AS a1 ON a1.AirportName = f.DepartureAirport INNER JOIN airport AS a2 ON a2.AirportName = f.ArrivalAirport WHERE a1.AirportCity = %s AND f.DepartureAirport = %s AND a2.AirportCity = %s AND f.ArrivalAirport = %s AND DepartureDate = %s'
+	cursor.execute(oneWayFlights, (source_city, source_air, dest_city, dest_air, dept_date))
+	data1 = cursor.fetchall()
+	cursor.close()
+	'''
+	return render_template('Customer-Search-Flights.html')
+
+@app.route('/Customer-View-One-Way-Flight-Search-Results', methods = ['GET', 'POST'])
+def viewCustOneWayFlights(): 
+	source_city = request.form['source-city-one']
+	source_air = request.form['source-airport-one']
+	dest_city = request.form['destination-city-one']
+	dest_air = request.form['destination-airport-one']
+	dept_date = request.form['departure-date-one']
+	
+	cursor = conn.cursor()
+	oneWayFlights = 'SELECT f.AirlineName, f.FlightNumber, f.DepartureDate, f.DepartureTime, ArrivalDate, FlightStatus, COUNT(ticketID) as booked, numberOfSeats FROM flight as f LEFT JOIN purchasedfor AS p ON p.FlightNumber = f.FlightNumber AND p.DepartureDate = f.DepartureDate AND p.DepartureTime = f.DepartureTime INNER JOIN updates AS u ON u.FlightNumber = f.FlightNumber AND u.DepartureDate = f.DepartureDate AND u.DepartureTime = f.DepartureTime INNER JOIN airplane ON f.AirplaneID = airplane.AirplaneID INNER JOIN airport AS a1 ON a1.AirportName = f.DepartureAirport INNER JOIN airport AS a2 ON a2.AirportName = f.ArrivalAirport WHERE f.FlightNumber NOT IN (SELECT FlightNumber from flight as f2 GROUP BY FlightNumber HAVING COUNT(f2.FlightNumber) > 1) AND a1.AirportCity = %s AND f.DepartureAirport = %s AND a2.AirportCity = %s AND f.ArrivalAirport = %s AND f.DepartureDate = %s GROUP BY f.AirlineName, f.FlightNumber, f.DepartureDate, f.DepartureTime, ArrivalDate, FlightStatus HAVING booked < NumberOfSeats'
+	cursor.execute(oneWayFlights, (source_city, source_air, dest_city, dest_air, dept_date))
+	data1 = cursor.fetchall()
+	cursor.close()
+	from datetime import date
+	today = date.today()
+	if dept_date < str(today): 
+		error = "Date is in the past"
+		data1 = ''
+		return render_template('Customer-View-One-Way-Flights.html',flights=data1, error = error)
+	if (data1):
+		return render_template('Customer-View-One-Way-Flights.html', flights=data1)
+	else: 
+		error = "No Flights Available"
+		return render_template('Customer-View-One-Way-Flights.html',flights=data1, error = error)
+
+@app.route('/Customer-Purchase-One-Way-Flight', methods = ['GET', 'POST'])
+def custPurchaseOneWayFlight(): 
+	flight_number = request.form['flight-number']
+	dept_date = request.form['departure-date']
+	dept_time = request.form['departure-time']
+	cursor = conn.cursor()
+	checkFlightHasSeats = 'SELECT f.AirlineName, f.FlightNumber, f.DepartureDate, f.DepartureTime, f.BasePrice, f.ArrivalDate, f.ArrivalAirport, f.DepartureAirport, COUNT(ticketID) as booked, numberOfSeats FROM flight as f LEFT JOIN purchasedfor AS p ON p.FlightNumber = f.FlightNumber AND p.DepartureDate = f.DepartureDate AND p.DepartureTime = f.DepartureTime INNER JOIN updates AS u ON u.FlightNumber = f.FlightNumber AND u.DepartureDate = f.DepartureDate AND u.DepartureTime = f.DepartureTime INNER JOIN airplane ON f.AirplaneID = airplane.AirplaneID INNER JOIN airport AS a1 ON a1.AirportName = f.DepartureAirport INNER JOIN airport AS a2 ON a2.AirportName = f.ArrivalAirport WHERE f.FlightNumber NOT IN (SELECT FlightNumber from flight as f2 GROUP BY FlightNumber HAVING COUNT(f2.FlightNumber) > 1) AND f.DepartureDate = %s AND f.DepartureTime = %s AND f.FlightNumber = %s GROUP BY f.AirlineName, f.FlightNumber, f.DepartureDate, f.DepartureTime, ArrivalDate, FlightStatus HAVING booked < NumberOfSeats'
+	cursor.execute(checkFlightHasSeats, (dept_date, dept_time, flight_number))
+	data = cursor.fetchone()
+	airline, arrival_date, arrival_airport, dept_air = data['AirlineName'], data['ArrivalDate'], data['ArrivalAirport'], data['DepartureAirport']
+	totalBooked = data['booked']
+	totalSeats = data['numberOfSeats']
+	basePrice = data['BasePrice']
+	if totalBooked/totalSeats >= 0.7: 
+		basePrice *= 1.2 
+	return render_template('Customer-Purchase-Tickets.html', airline = airline, flight_num = flight_number, dept_date = dept_date, dept_time = dept_time, arr_date = arrival_date, arr_air = arrival_airport, dept_air = dept_air, baseprice = basePrice)
+
+@app.route('/Search-One-Way-Flights-Public', methods = ['GET', 'POST'])
+def viewOneWayFlightsPublic(): 
+	source_city = request.form['source-city-one']
+	source_air = request.form['source-airport-one']
+	dest_city = request.form['destination-city-one']
+	dest_air = request.form['destination-airport-one']
+	dept_date = request.form['departure-date-one']
+	
+	cursor = conn.cursor()
+	oneWayFlights = 'SELECT AirlineName, FlightNumber, DepartureDate, DepartureTime, ArrivalDate, FlightStatus FROM Flight AS f NATURAL JOIN updates INNER JOIN airport AS a1 ON a1.AirportName = f.DepartureAirport INNER JOIN airport AS a2 ON a2.AirportName = f.ArrivalAirport WHERE a1.AirportCity = %s AND f.DepartureAirport = %s AND a2.AirportCity = %s AND f.ArrivalAirport = %s AND DepartureDate = %s'
+	cursor.execute(oneWayFlights, (source_city, source_air, dest_city, dest_air, dept_date))
+	data1 = cursor.fetchall()
+	cursor.close()
+	return render_template('Customer-View-One-Way-Flights.html', flights=data1)
+
+@app.route('/Search-Round-Trip-Public', methods = ['GET', 'POST'])
+def viewRoundTripFlightsPublic(): 
+	pass 
+
+@app.route('/Search-Flights-Public')
 def searchFlights():
-	return render_template('Search-Flights.html')
+	return render_template('Search-Flights-Public.html')
 
 #Define route for booking agent login
 @app.route('/Booking-Agent-Login')
