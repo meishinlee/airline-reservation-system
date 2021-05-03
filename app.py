@@ -247,36 +247,57 @@ def custPurchaseOneWayFlight():
 	if totalBooked/totalSeats >= 0.7: 
 		basePrice *= 1.2 
 	round_trip = "N/A"
+	session['airline'] = airline 
+	session['flight_num'] = flight_num
+	session['price'] = price
+	session['deptDate'] = dept_date
+	session['deptTime'] = dept_time
 	return render_template('Customer-Purchase-Tickets.html', airline = airline, flight_num = flight_number, dept_date = dept_date, dept_time = dept_time, arr_date = arrival_date, arr_air = arrival_airport, dept_air = dept_air, baseprice = basePrice, round_trip = round_trip)
 
 @app.route('/Customer-Enter-Card-Info', methods = ['GET', 'POST'])
 def custEnterCardInfo(): 
-	print("here1")
 	card_num = request.form['card-number']
-	print("1")
-	print(card_num)
 	card_name = request.form['card-name']
-	print("2")
-	print("request form1:",request.form)
 	exp_month = request.form['card-month']
-	print("request form:",request.form)
-	print(exp_month)
-	print("ok")
 	exp_year = request.form['card-year']
 	card_type = request.form['card-type']
-	print("here")
 	import datetime
 	#card_exp = "01-" + str(exp_month) + "-20" + str(exp_year)
 	card_exp = '20'+str(exp_year) + "-" + str(exp_month) + "-01"
   	#datetime.datetime.strptime(card_exp, '%d-%m-%y')
 	username = session['username']
 	checkCardExists = 'SELECT * FROM cardinfo WHERE cardNumber = %s'
+	print(card_exp)
+	cursor = conn.cursor()
 	cursor.execute(checkCardExists, (card_num))
 	data = cursor.fetchone()
 	if (data): 
 		print('Card in system. Just add the flight info + ticket')
+	else: 
+		insCard = 'INSERT INTO cardinfo VALUES(%s, %s, %s, %s)'
+		cursor.execute(insCard, (card_num, card_type, card_name, card_exp))
+		insPersonalInfo = 'INSERT INTO providespersonalinfo VALUES (%s, %s)'
+		cursor.execute(insPersonalInfo, (card_num, username))
+	#finding the max ticket number from sql so we can generate another new ticket number 
+	findMaxTicketNumber = 'SELECT MAX(TicketID) AS currTicket FROM ticket'
+	cursor.execute(findMaxTicketNumber)
+	maxTicket = cursor.fetchone()['currTicket']
+	ticketNumber = maxTicket + 1
+	#finding airline name, flight number, sold price, which is stored in session
+	from datetime import date
+	today = date.today()
+	now = datetime.now()
+	insTicket = 'INSERT INTO ticket VALUES(%s, %s, %s, %s)'
+	cursor.execute(insTicket, (ticketNumber, username, session['airline'], session['flight_num'], session['price'], today, now, NULL))
+	#ins into payment method
+	insPaymentMethod = 'INSERT INTO paymentmethod VALUES (%s, %s)'
+	cursor.execute(insPaymentMethod, (card_num, ticketNumber))
+	#ins into purchased for
+	insPurchasedFor = 'INSERT INTO purchasedfor VALUES (%s, %s, %s, %s)'
+	cursor.execute(insPurchasedFor, (ticketNumber, session['flight_num'], session['deptDate'], session['deptTime']))
+	conn.commit()
 	return render_template('Customer-Home.html')
-	#else add card info. 
+	#MIGHT NOT BE DONE
 
 @app.route('/Search-One-Way-Flights-Public', methods = ['GET', 'POST'])
 def viewOneWayFlightsPublic(): 
