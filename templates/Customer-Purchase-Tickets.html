@@ -41,31 +41,32 @@
                   <p class="u-align-center u-text u-text-4">Airline &amp; Arrival Date: {{airline}}, {{arr_date}}</p>
                   <p class="u-align-center u-text u-text-5">Flight Number: {{flight_num}}</p>
                   <p class="u-align-center u-text u-text-6">Arrival and Departure Airport: {{arr_air}}, {{dept_air}}</p>
-                  <p class="u-align-center u-text u-text-6">Base Price: ${{baseprice}}</p>
+                  <p class="u-align-center u-text u-text-7">Base Price: ${{baseprice}}</p>
+                  <p class="u-align-center u-text u-text-8">Round Trip Additional Info: {{round_trip}}</p>
                 </div>
               </div>
               <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-2">
                 <div class="u-container-layout u-valign-top u-container-layout-2">
                   <div class="u-form u-form-1">
-                    <form action="#" method="POST" class="u-clearfix u-form-custom-backend u-form-spacing-10 u-form-vertical u-inner-form" style="padding: 10px" source="custom" name="form" redirect="true">
+                    <form action="/Customer-Enter-Card-Info" method="POST" class="u-clearfix u-form-custom-backend u-form-spacing-10 u-form-vertical u-inner-form" style="padding: 10px" source="custom" name="form" redirect="true">
                       <input type="hidden" id="siteId" name="siteId" value="271440522">
                       <input type="hidden" id="pageId" name="pageId" value="193009990">
                       <div class="u-form-group u-form-group-1">
                         <label for="text-b6dd" class="u-form-control-hidden u-label"></label>
-                        <input type="text" placeholder="Card Type" id="text-b6dd" name="text-2" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
+                        <input type="text" placeholder="Card Type" id="text-b6dd" name="card-type" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
                       </div>
                       <div class="u-form-group u-form-group-2">
                         <label for="text-db69" class="u-form-control-hidden u-label"></label>
-                        <input type="text" placeholder="Enter the Card Number" id="text-db69" name="text" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
+                        <input type="number" placeholder="Enter the Card Number" id="text-db69" name="card-number" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
                       </div>
                       <div class="u-form-group u-form-group-3">
                         <label for="text-4292" class="u-form-control-hidden u-label"></label>
-                        <input type="text" placeholder="Enter the Card Name" id="text-4292" name="text-1" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
+                        <input type="text" placeholder="Enter the Card Name" id="text-4292" name="card-name" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
                       </div>
                       <div class="u-form-group u-form-partition-factor-2 u-form-select u-form-group-4">
                         <label for="select-d4f2" class="u-label">MM of Card Expiration Date</label>
                         <div class="u-form-select-wrapper">
-                          <select id="select-d4f2" name="select" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" size="5">
+                          <select id="select-d4f2" name="card-month" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" size="5">
                             <option value="01">01</option>
                             <option value="02">02</option>
                             <option value="03">03</option>
@@ -85,7 +86,7 @@
                       <div class="u-form-group u-form-partition-factor-2 u-form-select u-form-group-5">
                         <label for="select-da5b" class="u-label">Year of Card Expiration Date</label>
                         <div class="u-form-select-wrapper">
-                          <select id="select-da5b" name="select-1" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" size="5">
+                          <select id="select-da5b" name="card-year" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" size="5">
                             <option value="2030">2030</option>
                             <option value="2029">2029</option>
                             <option value="2028">2028</option>
@@ -102,7 +103,7 @@
                       </div>
                       <div class="u-form-group u-form-group-6">
                         <label for="text-6832" class="u-form-control-hidden u-label"></label>
-                        <input type="password" placeholder="Enter the Card Security Code" id="text-6832" name="text-3" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
+                        <input type="password" placeholder="Enter the Card Security Code" id="text-6832" name="CVV" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
                       </div>
                       <div class="u-align-center u-form-group u-form-submit">
                         <a href="#" class="u-btn u-btn-submit u-button-style">Submit</a>

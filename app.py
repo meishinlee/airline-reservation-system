@@ -246,7 +246,37 @@ def custPurchaseOneWayFlight():
 	basePrice = data['BasePrice']
 	if totalBooked/totalSeats >= 0.7: 
 		basePrice *= 1.2 
-	return render_template('Customer-Purchase-Tickets.html', airline = airline, flight_num = flight_number, dept_date = dept_date, dept_time = dept_time, arr_date = arrival_date, arr_air = arrival_airport, dept_air = dept_air, baseprice = basePrice)
+	round_trip = "N/A"
+	return render_template('Customer-Purchase-Tickets.html', airline = airline, flight_num = flight_number, dept_date = dept_date, dept_time = dept_time, arr_date = arrival_date, arr_air = arrival_airport, dept_air = dept_air, baseprice = basePrice, round_trip = round_trip)
+
+@app.route('/Customer-Enter-Card-Info', methods = ['GET', 'POST'])
+def custEnterCardInfo(): 
+	print("here1")
+	card_num = request.form['card-number']
+	print("1")
+	print(card_num)
+	card_name = request.form['card-name']
+	print("2")
+	print("request form1:",request.form)
+	exp_month = request.form['card-month']
+	print("request form:",request.form)
+	print(exp_month)
+	print("ok")
+	exp_year = request.form['card-year']
+	card_type = request.form['card-type']
+	print("here")
+	import datetime
+	#card_exp = "01-" + str(exp_month) + "-20" + str(exp_year)
+	card_exp = '20'+str(exp_year) + "-" + str(exp_month) + "-01"
+  	#datetime.datetime.strptime(card_exp, '%d-%m-%y')
+	username = session['username']
+	checkCardExists = 'SELECT * FROM cardinfo WHERE cardNumber = %s'
+	cursor.execute(checkCardExists, (card_num))
+	data = cursor.fetchone()
+	if (data): 
+		print('Card in system. Just add the flight info + ticket')
+	return render_template('Customer-Home.html')
+	#else add card info. 
 
 @app.route('/Search-One-Way-Flights-Public', methods = ['GET', 'POST'])
 def viewOneWayFlightsPublic(): 
