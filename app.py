@@ -107,7 +107,7 @@ def customerLoginAuth():
 		#creates a session for the the user
 		#session is a built in
 		session['username'] = username
-		session['role'] = 'customer'
+		#session['role'] = 'customer'
 		return render_template('Customer-Home.html', name = username)
 	else:
 		#print("here")
@@ -118,7 +118,7 @@ def customerLoginAuth():
 @app.route('/logout')
 def logout():
 	session.pop('username')
-	session.pop('role')
+	#session.pop('role')
 	print(session)
 	return redirect('/')
 	#return render_template('index.html')
@@ -265,7 +265,7 @@ def custPurchaseOneWayFlight():
 	if totalBooked/totalSeats >= 0.7: 
 		basePrice *= 1.2 
 	round_trip = "N/A"
-	return render_template('Customer-Purchase-Tickets.html', airline = airline, flight_num = flight_number, dept_date = dept_date, dept_time = dept_time, arr_date = arrival_date, arr_time = arr_time, arr_air = arrival_airport, dept_air = dept_air, baseprice = basePrice, round_trip = round_trip, bookingAgent = "NULL")
+	return render_template('Customer-Purchase-Tickets.html', airline = airline, flight_num = flight_number, dept_date = dept_date, dept_time = dept_time, arr_date = arrival_date, arr_time = arr_time, arr_air = arrival_airport, dept_air = dept_air, f1price = basePrice, round_trip = round_trip, bookingAgent = "NULL")
 
 @app.route('/Customer-Purchase-Two-Way-Flight', methods = ['GET', 'POST'])
 def custPurchaseTwoWayFlight(): 
@@ -318,6 +318,12 @@ def custEnterCardInfo():
 	exp_month = request.form['card-month']
 	exp_year = request.form['card-year']
 	card_type = request.form['card-type']
+	cust_username = request.form['cust-username']
+	if cust_username == username: 
+		cust_username = username
+		booking_agent = 'NULL'
+	else: 
+		booking_agent = username
 	import datetime
 	#card_exp = "01-" + str(exp_month) + "-" + str(exp_year)
 	card_exp = str(exp_year) + "-" + str(exp_month) + "-01"
@@ -336,7 +342,7 @@ def custEnterCardInfo():
 		cursor.execute(insPersonalInfo, (card_num, username))
 	#finding the max ticket number from sql so we can generate another new ticket number 
 
-	findMaxTicketNumber = 'SELECT MAX(TicketID) AS currTicket FROM ticket'
+	findMaxTicketNumber = 'SELECT MAX(CAST(TicketID AS INT)) AS currTicket FROM ticket'
 	cursor.execute(findMaxTicketNumber)
 	maxTicket = cursor.fetchone()['currTicket']
 	print(maxTicket)
@@ -353,7 +359,7 @@ def custEnterCardInfo():
 	dept_date = request.form['dept-date']
 	dept_time = request.form['dept-time']
 	round_trip = request.form['round-trip']
-	booking_agent = request.form['bookingagent']
+	#booking_agent = request.form['bookingagent']
 	base_price_1 = request.form['base-price-1']
 	base_price_2 = request.form['base-price-2']
 	from datetime import date
@@ -362,7 +368,7 @@ def custEnterCardInfo():
 	now = datetime.now()
 	print("compared dates")
 	insTicket = 'INSERT INTO ticket VALUES(%s, %s, %s, %s, %s, %s, %s, %s)'
-	cursor.execute(insTicket, (ticketNumber, username, airline, flight_number, base_price_1, today, now, booking_agent))
+	cursor.execute(insTicket, (ticketNumber, cust_username, airline, flight_number, base_price_1, today, now, booking_agent))
 	print("ins ticket")
 	#ins into payment method
 	insPaymentMethod = 'INSERT INTO paymentmethod VALUES (%s, %s)'
@@ -370,13 +376,17 @@ def custEnterCardInfo():
 	insPurchasedFor = 'INSERT INTO purchasedfor VALUES (%s, %s, %s, %s)'
 	print(flight_number,dept_date,dept_time)
 	cursor.execute(insPurchasedFor, (ticketNumber, flight_number, dept_date, dept_time))
+	if booking_agent != "NULL": 
+		insCommission = 'INSERT INTO creates VALUES (%s, %s, %s)'
+		comAmount = float(base_price_1) * 0.1
+		cursor.execute(insCommission, (booking_agent, ticketNumber, comAmount))
 
 	#check if this is a round trip flight
 	if round_trip != "N/A": #that means that this is a round trip flight 
 
 		ticketNumber += 1 #ticket number will be unique so we will increment 1
 		insRoundTripTicket = 'INSERT INTO ticket VALUES(%s, %s, %s, %s, %s, %s, %s, %s)'
-		cursor.execute(insTicket, (ticketNumber, username, airline, flight_number, base_price_2, today, now, booking_agent))
+		cursor.execute(insTicket, (ticketNumber, cust_username, airline, flight_number, base_price_2, today, now, booking_agent))
 		#ins into payment method
 		insPaymentMethod = 'INSERT INTO paymentmethod VALUES (%s, %s)'
 		cursor.execute(insPaymentMethod, (card_num, ticketNumber))
@@ -389,12 +399,16 @@ def custEnterCardInfo():
 		#ins into purchased for
 		insPurchasedFor = 'INSERT INTO purchasedfor VALUES (%s, %s, %s, %s)'
 		cursor.execute(insPurchasedFor, (ticketNumber, flight_number, roundDeptDate, roundDeptTime))
+		if booking_agent != "NULL": 
+			insCommission = 'INSERT INTO creates VALUES (%s, %s, %s)'
+			comAmount = float(base_price_2) * 0.1
+			cursor.execute(insCommission, (booking_agent, ticketNumber, comAmount))
 
 	conn.commit()
 	if booking_agent == "NULL": 
-		return render_template('Customer-Home.html')
+		return render_template('Customer-Home.html', name = cust_username)
 	else: 
-		return render_template('Booking-Agent-Home.html')
+		return render_template('Booking-Agent-Home.html', username = username)
 	#MIGHT NOT BE DONE
 
 @app.route('/Search-One-Way-Flights-Public', methods = ['GET', 'POST'])
@@ -452,7 +466,7 @@ def bookingAgentLoginAuth():
 		#creates a session for the the user
 		#session is a built in
 		session['username'] = username
-		session['role'] = 'booking agent'
+		#session['role'] = 'booking agent'
 		return render_template('Booking-Agent-Home.html', username = session['username'])
 	else:
 		#returns an error message to the html page
@@ -563,7 +577,7 @@ def topCusts():
 	print(values)
 	cursor.close()
 	print(datay)
-	return render_template('Booking-Agent-Top-Customers.html',  title='Top Customers by Commission', max=50, labels=labels, values=values)
+	return render_template('Booking-Agent-Top-Customers.html',  title='Top Customers by Commission', max=5000, labels=labels, values=values)
 
 @app.route('/View-Commissions')
 def view_commissions_main(): 
@@ -618,7 +632,7 @@ def AirlineStaffLoginAuth():
 		#creates a session for the the user
 		#session is a built in
 		session['username'] = username
-		session['role'] = 'airline staff'
+		#session['role'] = 'airline staff'
 		return render_template('Airline-Staff-Home.html')
 		#return redirect(url_for('viewFlightsPublic'))
 	else:
