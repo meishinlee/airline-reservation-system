@@ -37,7 +37,7 @@ In Progress:
     - Top 5 Customers (DONE, but need to add more customers for test case)
     - Logout (finished)
 - Airline Staff Homepage 
-    - View flights <- All done except view flight customers
+    - View flights <- All done 
     - Create flights (done)<--By default should i have a 'On time' Flight status (updates table)?
     - Update stuff (done)
     - Logout (Finished)
@@ -50,12 +50,11 @@ Flight 6 and 7 are round trips. Everything else is one way
 
 Total Not done: 
 Customer: 
-    - Search Flight Table (finished for single flights) + Purchase (Linked to flask, but did not insert into DB yet)
+    - Search Flight Table (finished for single flights) + Purchase (Linked to flask, but did not insert into DB yet)!!
     - Track Spending Chart
 Booking Agent: 
-    - Search Flights + Purchase Tickets
+    - Search Flights + Purchase Tickets (BOOKING AGENT TEST CASE?)
 Airline Staff: 
-    - View Flights <- Customers on a flight
     - View Revenue Chart
     - View Reports 
 

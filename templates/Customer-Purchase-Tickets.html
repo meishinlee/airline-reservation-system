@@ -51,6 +51,17 @@
                     <form action="/Customer-Enter-Card-Info" method="POST" class="u-clearfix u-form-custom-backend u-form-spacing-10 u-form-vertical u-inner-form" style="padding: 10px" source="custom" name="form" redirect="true">
                       <input type="hidden" id="siteId" name="siteId" value="271440522">
                       <input type="hidden" id="pageId" name="pageId" value="193009990">
+                      <input class="hide" style="visibility:hidden" name="airline" type= "text" value= "{{airline}}" readonly>
+                      <input class="hide" style="visibility:hidden" name="flight-number" type= "number" value= "{{flight_num}}" readonly>
+                      <input class="hide" style="visibility:hidden" name="dept-date" type= "date" value= "{{dept_date}}" readonly>
+                      <input class="hide" style="visibility:hidden" name="dept-time" type= "time" value= "{{dept_time}}" readonly>
+                      <input class="hide" style="visibility:hidden" name="price" type= "number" value= "{{baseprice}}" readonly>
+                      <input class="hide" style="visibility:hidden" name="round-trip" type= "text" value= "{{round_trip}}" readonly>
+                      <input class="hide" style="visibility:hidden" name="bookingagent" type= "text" value= "{{bookingAgent}}" readonly>
+                      <input class="hide" style="visibility:hidden" name="arr-time" type= "time" value= "{{arr_time}}" readonly>
+                      <input class="hide" style="visibility:hidden" name="arr-date" type= "date" value= "{{arr_date}}" readonly>
+                      <input class="hide" style="visibility:hidden" name="base-price-1" type= "number" value= "{{f1price}}" readonly>
+                      <input class="hide" style="visibility:hidden" name="base-price-2" type= "number" value= "{{f2price}}" readonly>
                       <div class="u-form-group u-form-group-1">
                         <label for="text-b6dd" class="u-label">Card Type</label>
                         <div class="u-form-select-wrapper">
@@ -120,7 +131,7 @@
                       <input type="hidden" value="" name="recaptchaResponse">
                     </form>
                   </div>
-                  <a href="http://127.0.0.1:5000/Customer-Home" class="u-btn u-button-style u-hover-palette-1-dark-1 u-palette-1-base u-btn-2">Go Back to Customer Home</a>
+                  <!--<a href="http://127.0.0.1:5000/Customer-Home" class="u-btn u-button-style u-hover-palette-1-dark-1 u-palette-1-base u-btn-2">Go Back to Customer Home</a>-->
                 </div>
               </div>
             </div>

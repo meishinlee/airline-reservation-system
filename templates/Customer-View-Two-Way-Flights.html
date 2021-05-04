@@ -33,9 +33,11 @@
       <div class="u-clearfix u-sheet u-sheet-1">
         <h1 class="u-align-center u-custom-font u-font-ubuntu u-text u-text-black u-text-default u-text-1">View Flights (with Seats Remaining)</h1>
         <div class="u-form u-form-1">
-            <form action="/Customer-Purchase-One-Way-Flight" method="POST" class="u-clearfix u-form-custom-backend u-form-spacing-10 u-form-vertical u-inner-form" style="padding: 10px" source="custom" name="form" redirect="true">
+            <form action="/Customer-Purchase-Two-Way-Flight" method="POST" class="u-clearfix u-form-custom-backend u-form-spacing-10 u-form-vertical u-inner-form" style="padding: 10px" source="custom" name="form" redirect="true">
               <input type="hidden" id="siteId" name="siteId" value="270108917">
               <input type="hidden" id="pageId" name="pageId" value="2840821394">
+              <!--<input class="hide" style="visibility:hidden" name="booked" type= "text" value= "{{booked}}" readonly>
+              <input class="hide" style="visibility:hidden" name="numSeats" type= "number" value= "{{numSeats}}" readonly>-->
               <div class="u-form-group u-form-name">
                 <label for="name-4de5" class="u-form-control-hidden u-label">Flight Number</label>
                 <input type="number" placeholder="Enter flight Number" id="name-4de5" name="flight-number" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" required="">
@@ -47,6 +49,14 @@
               <div class="u-form-group u-form-name">
                 <label for="name-4de5" class="u-form-control-hidden u-label">Departure Time</label>
                 <input type="Time" placeholder="Enter Departure Time" id="name-4de5" name="departure-time" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" required="">
+              </div>
+              <div class="u-form-group u-form-name">
+                <label for="name-4de5" class="u-form-control u-label" style:color = "black">Return Date</label>
+                <input type="Date" placeholder="Enter Departure Time" id="name-4de5" name="return-date" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" required="">
+              </div>
+              <div class="u-form-group u-form-name">
+                <label for="name-4de5" class="u-form-control u-label">Return Time</label>
+                <input type="Time" placeholder="Enter Departure Time" id="name-4de5" name="return-time" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" required="">
               </div>
               <div class="u-align-center u-form-group u-form-submit">
                 <a href="http://127.0.0.1:5000/Customer-One-Way-Flight-Search-Results" class="u-btn u-btn-submit u-button-style">Submit</a>
@@ -72,10 +82,10 @@
               <tr style="height: 45px;">
                 <th class="u-table-cell">Airline name</th>
                 <th class="u-table-cell">Flight number</th>
-                <th class="u-table-cell">Departure Date</th>
-                <th class="u-table-cell">Departure Time</th>
-                <th class="u-table-cell">Arrival Date</th>
-                <th class="u-table-cell">Flight Status</th>
+                <th class="u-table-cell">Departure Date (To)</th>
+                <th class="u-table-cell">Departure Time (To)</th>
+                <th class="u-table-cell">Return Date (Back)</th>
+                <th class="u-table-cell">Return Time (Back)</th>
               </tr>
             </thead>
             <tbody class="u-align-center u-table-body u-text-body-color">
@@ -85,8 +95,8 @@
                 <td class="u-table-cell">{{line['FlightNumber']}}</td>
                 <td class="u-table-cell u-white u-table-cell-7">{{line['DepartureDate']}}</td>
                 <td class="u-table-cell">{{line['DepartureTime']}}</td>
-                <td class="u-table-cell u-white u-table-cell-19">{{line['ArrivalDate']}}</td>
-                <td class="u-table-cell">{{line['FlightStatus']}}</td>
+                <td class="u-table-cell u-white u-table-cell-19">{{line['ReturnDate']}}</td>
+                <td class="u-table-cell">{{line['ReturnTime']}}</td>
               </tr>
               {% endfor %}
             </tbody>
