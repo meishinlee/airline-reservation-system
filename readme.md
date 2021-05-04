@@ -50,12 +50,13 @@ Flight 6 and 7 are round trips. Everything else is one way
 
 Total Not done: 
 Customer: 
-    - Search Flight Table (finished for single flights) + Purchase (Linked to flask, but did not insert into DB yet)!!
-    - Track Spending Chart
+    - Search Flight Table (FINISHED)
+    - Track Spending Chart 
 Booking Agent: 
-    - Search Flights + Purchase Tickets (BOOKING AGENT TEST CASE?)
+    - Search Flights + Purchase Tickets (FINISHED)
+    - Top Commission = Charts not showing properly
 Airline Staff: 
-    - View Revenue Chart
+    - View Revenue Chart <-can't display chart>
     - View Reports 
 
 *******SEE LINE 300

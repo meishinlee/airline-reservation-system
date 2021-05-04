@@ -556,28 +556,34 @@ def topCusts():
 	username = session['username']
 	cursor = conn.cursor()
 	#topCusts = 'SELECT customerEmail, SUM(CommissionAmount) AS commission FROM customer NATURAL JOIN ticket NATURAL JOIN creates WHERE agentemail = %s GROUP BY customerEmail ORDER BY commission DESC LIMIT 5'
-	topCustsx = 'SELECT customerEmail FROM customer NATURAL JOIN ticket NATURAL JOIN creates WHERE agentemail = %s GROUP BY customerEmail ORDER BY SUM(CommissionAmount) DESC LIMIT 5'
-	cursor.execute(topCustsx, (username))
-	datax = cursor.fetchall()
-	print(username)
-	print(datax)
+	topCustsTicket = 'SELECT customerEmail, COUNT(ticketID) AS tickets FROM customer NATURAL JOIN ticket NATURAL JOIN creates WHERE agentemail = %s AND PuchaseDate >= CURRENT_DATE - INTERVAL 6 MONTH  GROUP BY customerEmail ORDER BY COUNT(ticketID) DESC LIMIT 5'
+	cursor.execute(topCustsTicket, (username))
+	custsByTicket = cursor.fetchall()
+	#print(custsByTicket)
 	labels = [] 
-	for elem in datax: 
-		for key in elem: 
-			labels.append(elem[key])
-	print(labels)
+	values = []
+	for elem in custsByTicket: 
+		key = elem['customerEmail']
+		#for key in elem: 
+		labels.append(key)
+		value = elem['tickets']
+		values.append(value)
+	print(labels,values)
 
-	topCustsy = 'SELECT SUM(CommissionAmount) AS commission FROM customer NATURAL JOIN ticket NATURAL JOIN creates WHERE agentemail = %s GROUP BY customerEmail ORDER BY commission DESC LIMIT 5'
-	cursor.execute(topCustsy, (username))
-	datay = cursor.fetchall()
-	values = [] 
-	for elem in datay: 
-		for key in elem: 
-			values.append(elem[key])
-	print(values)
+	topCustsCommission = 'SELECT customerEmail, SUM(commissionAmount) AS commission FROM customer NATURAL JOIN ticket NATURAL JOIN creates WHERE agentemail = %s AND PuchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR  GROUP BY customerEmail ORDER BY SUM(commissionAmount) DESC LIMIT 5'
+	cursor.execute(topCustsCommission, (username))
+	custsByCommission = cursor.fetchall()
+	custs = []
+	commission = []
+	for elem in custsByCommission: 
+		key = elem['customerEmail']
+		custs.append(key)
+		coms = elem['commission']
+		commission.append(coms)
+	print(custs, commission)
+
 	cursor.close()
-	print(datay)
-	return render_template('Booking-Agent-Top-Customers.html',  title='Top Customers by Commission', max=5000, labels=labels, values=values)
+	return render_template('Booking-Agent-Top-Customers.html',  title='Top Customers by Commission', max=50, labels=labels, values=values, custs = custs, commission = commission, max1= 200)
 
 @app.route('/View-Commissions')
 def view_commissions_main(): 
@@ -957,7 +963,6 @@ def view_specific_flight_rating():
 	flight_number = request.form['flight-number']
 	dept_date = request.form['dept-date']
 	dept_time = request.form['dept-time']
-	print("hi")
 	cursor = conn.cursor()
 	getFlightRatingComments = 'SELECT Rate, CustomerComment FROM suggested WHERE FlightNumber = %s AND DepartureDate = %s AND DepartureTime = %s'
 	cursor.execute(getFlightRatingComments, (flight_number, dept_date, dept_time))
@@ -972,6 +977,31 @@ def view_specific_flight_rating():
 		error = "Flight does not exist, or has no ratings"
 		return render_template('Airline-Staff-View-Flight-Rating.html', flights = data, error = error, flight= flight_number, date = dept_date, time = dept_time)
 
+@app.route('/Airline-Staff-Compare-Revenue')
+def airlineStaffRevenue(): 
+	cursor = conn.cursor()
+	#returns indirect, direct
+	getRevenueMonth = 'SELECT SUM(SoldPrice) as sale FROM ticket WHERE AgentID <> %s AND PuchaseDate >= CURRENT_DATE - INTERVAL 1 MONTH UNION SELECT SUM(SoldPrice) as sale FROM ticket WHERE AgentID = %s AND PuchaseDate >= CURRENT_DATE - INTERVAL 1 MONTH'
+	null = 'NULL'
+	cursor.execute(getRevenueMonth, (null, null))
+	monthSales = cursor.fetchall()
+	print("sales:",monthSales)
+	set = []
+
+	monthIndirectSales = monthSales[0]['sale']
+	monthDirectSales = monthSales[1]['sale']
+
+	data1 = ['indirect sale', monthIndirectSales, 'blue']
+	data2 = ['direct sale', monthDirectSales, 'red']
+	set.append(data1)
+	set.append(data2)
+	print(set)
+
+	getRevenueYear = 'SELECT SUM(SoldPrice) as sale FROM ticket WHERE AgentID <> %s AND PuchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR UNION SELECT SUM(SoldPrice) as sale FROM ticket WHERE AgentID = %s AND PuchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR'
+	cursor.execute(getRevenueYear, (null, null))
+	yearSales = cursor.fetchall()
+	return render_template('Airline-Staff-Compare-Revenue.html', set = set, max = 100)
+	
 
 '''
 @app.route('/Airline-Staff-View-Agents-Customers')

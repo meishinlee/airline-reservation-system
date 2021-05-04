@@ -1,0 +1,30 @@
+<script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
+
+<h1>Comparison of Revenue from Direct and Indirect Sales</h1>
+<h3>Comparison of Revenue from Direct and Indirect Sales in Last Month</h3>
+<center>
+    <canvas id="chart1" width="600" height="400"></canvas>
+        <script>
+          var pieData = [
+            {% for label, item, colors in set %}
+              {
+                label: "{{label}}",
+                value: {{item}},
+                color : "{{colors}}"
+              },
+            {% endfor %}
+          ];
+    
+          // get bar chart canvas
+          var mychart = document.getElementById("chart1").getContext("2d");
+          steps = 10
+          max = {{ max }}
+    
+          // draw pie chart
+          new Chart(mychart).Pie(pieData);
+    
+        </script>
+    </center>
+    <body>
+      <a href="http://127.0.0.1:5000/Airline-Staff-Home">Back to Airline Staff Home</a>
+      </body>
