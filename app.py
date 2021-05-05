@@ -1089,8 +1089,60 @@ def airlineStaffRevenue():
 	yearSet.append(year2)
 
 	return render_template('Airline-Staff-Compare-Revenue.html', set = set, max = 100, yearSet = yearSet)
-	
 
+@app.route('/Airline-Staff-View-Reports')
+def airlineViewReport(): 
+	cursor = conn.cursor()
+	getAmountTicketLastMonth = 'SELECT COUNT(TicketID) AS tickets, MONTHNAME(PurchaseDate) AS month FROM ticket WHERE PurchaseDate >= CURRENT_DATE - INTERVAL 1 MONTH GROUP BY month'
+	cursor.execute(getAmountTicketLastMonth)
+	lastMonth = cursor.fetchone()
+	labels, values = [lastMonth['month']], [lastMonth['tickets']]
+	getAmountTicketLastYear = 'SELECT COUNT(TicketID) AS tickets, MONTHNAME(PurchaseDate) AS month FROM ticket WHERE PurchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR GROUP BY month'
+	cursor.execute(getAmountTicketLastYear)
+	ticketLastYear = cursor.fetchall()
+	months = {1:'January', 2: 'February', 3:'March',4:'April',5:'May',6:'June',7:'July',8:'August',9:'September',10:'October',11:'November',12:'December'}
+	from datetime import date
+	currMonth = date.today().month
+	earliest = currMonth-12 #for graphing years
+	labels1 = []
+	for i in range(earliest,currMonth): 
+		if i>0 and i<13: 
+			labels1.append(months[i])
+		elif i < 1: 
+			i += 12
+			labels1.append(months[i])
+	values1 = []
+	for elem in labels1:
+		added = False
+		for i in range (len(ticketLastYear)): 
+			if ticketLastYear[i]['month'] == elem: 
+				values1.append(ticketLastYear[i]['tickets'])
+				added = True
+				break
+		if added == False: 
+			values1.append(0)
+	maximumValue = max(values1) + 1
+
+	return render_template('Airline-Staff-View-Reports.html', labels = labels, values = values, labels1 = labels1, values1 = values1, max = 10, max1 = maximumValue)
+
+@app.route('/Airline-Staff-View-Report-Custom', methods = ['GET', 'POST'])
+def airlineStaffViewReportCustom(): 
+	print(request.form)
+	start_date = request.form['start-date']
+	end_date = request.form['end-date']
+	cursor = conn.cursor()
+	getTicketAmount = 'SELECT COUNT(TicketID) AS tickets, MONTHNAME(PurchaseDate) AS month, YEAR(PurchaseDate) AS year FROM ticket WHERE PurchaseDate >= %s AND PurchaseDate <= %s GROUP BY month'
+	cursor.execute(getTicketAmount, (start_date, end_date))
+	data = cursor.fetchall()
+	labels = []
+	values = []
+	for elem in data: 
+		date = str(elem['month']) + " " + str(elem['year'])
+		labels.append(date)
+		values.append(elem['tickets'])
+		
+	maximumValue = max(values) + 1
+	return render_template('Airline-Staff-View-Reports-Custom.html', labels = labels, values = values, max = maximumValue)
 '''
 @app.route('/Airline-Staff-View-Agents-Customers')
 def airline_staff_view_people():
