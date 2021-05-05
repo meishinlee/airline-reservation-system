@@ -51,13 +51,14 @@ Flight 6 and 7 are round trips. Everything else is one way
 Total Not done: 
 Customer: 
     - Search Flight Table (FINISHED)
-    - Track Spending Chart 
+    - Track Spending Chart (finished last bullet but??)
 Booking Agent: 
     - Search Flights + Purchase Tickets (FINISHED)
-    - Top Commission = Charts not showing properly
+    - Top Commission (FINISHED)
 Airline Staff: 
-    - View Revenue Chart <-can't display chart>
-    - View Reports 
+    - View Revenue Chart (FINISHED)
+    - View Reports !!!
+Need to build new database and see if it works. On cascade only
 
 *******SEE LINE 300
 

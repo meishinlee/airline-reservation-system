@@ -25,6 +25,30 @@
     
         </script>
     </center>
+    <h3>Comparison of Revenue from Direct and Indirect Sales in Last Year</h3>
+    <center>
+      <canvas id="chart2" width="600" height="400"></canvas>
+          <script>
+            var pieData = [
+              {% for label, item, colors in yearSet %}
+                {
+                  label: "{{label}}",
+                  value: {{item}},
+                  color : "{{colors}}"
+                },
+              {% endfor %}
+            ];
+      
+            // get bar chart canvas
+            var mychart = document.getElementById("chart2").getContext("2d");
+            steps = 10
+            max = {{ max }}
+      
+            // draw pie chart
+            new Chart(mychart).Pie(pieData);
+      
+          </script>
+      </center>
     <body>
       <a href="http://127.0.0.1:5000/Airline-Staff-Home">Back to Airline Staff Home</a>
       </body>

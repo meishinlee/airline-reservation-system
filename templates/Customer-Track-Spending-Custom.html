@@ -1,0 +1,72 @@
+<html>
+<head>
+    
+    <meta charset="utf-8" />
+    <!--<title>{{ title }}</title>-->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/nicepage.css') }}" media="screen">
+
+</head>
+<body>
+    <center>
+    <!--<h1>Yearly Spending: ${{yearSpend}}</h3>
+
+    <h1>{{ title }}</h1>-->
+    
+    <h2>Amount Spent by Month - Custom Dates</h2>
+    <h3>Months that are not shown indicate that user did not spend during that month</h3>
+  </center>
+  <center>
+    <canvas id="chart1" width="600" height="400"></canvas>
+    <script>
+      // bar chart data
+      var barData = {
+        labels : [
+          {% for item in labels %}
+           "{{ item }}",
+          {% endfor %}
+	],
+
+        datasets : [{
+          fillColor: "rgba(151,187,205,0.2)",
+          strokeColor: "rgba(151,187,205,1)",
+          pointColor: "rgba(151,187,205,1)",
+          data : [
+            {% for item in values %}
+               "{{ item }}",
+              {% endfor %}
+	    ]
+          }
+        ]
+      }
+
+     // get bar chart canvas
+     var mychart1 = document.getElementById("chart1").getContext("2d");
+
+       steps = 10
+       max = {{max}}
+
+     // draw bar chart
+     new Chart(mychart1).Bar(barData, {
+       scaleOverride: true,
+       scaleSteps: steps,
+       scaleStepWidth: Math.ceil(max / steps),
+       scaleStartValue: 0,
+       scaleShowVerticalLines: true,
+       scaleShowGridLines : true,
+       barShowStroke : true,
+       scaleShowLabels: true
+       }
+     );
+
+    </script>
+  </center>
+
+  <center>
+<a href="http://127.0.0.1:5000/Customer-Home">Back to Customer Home</a>
+</center>
+
+</body>
+
+
+</html>

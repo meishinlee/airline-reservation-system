@@ -178,6 +178,59 @@ def rateFlightAuth():
 		error = "Ticket ID does not exist"
 		return render_template('Rate-my-Flights.html', error=error)
 	
+@app.route('/Customer-Track-Spending')
+def customerTrackSpending(): 
+	username = session['username']
+	cursor = conn.cursor()
+	getCustYearlySpending = 'SELECT SUM(SoldPrice) AS spend FROM ticket NATURAL JOIN purchasedfor WHERE CustomerEmail = %s AND PurchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR'
+	cursor.execute(getCustYearlySpending, (username))
+	yearSpend = cursor.fetchone()['spend']
+	getCustMonthlySpending = 'SELECT MONTHNAME(PurchaseDate) AS month, SUM(soldPrice) as spent FROM ticket NATURAL JOIN purchasedfor WHERE CustomerEmail = %s AND PurchaseDate >= CURRENT_DATE - INTERVAL 6 MONTH GROUP BY MONTHNAME(PurchaseDate)'
+	cursor.execute(getCustMonthlySpending, (username))
+	custMonthlySpending = cursor.fetchall() 
+	labels = []
+	months = {1:'January', 2: 'February', 3:'March',4:'April',5:'May',6:'June',7:'July',8:'August',9:'September',10:'October',11:'November',12:'December'}
+	from datetime import date
+	currMonth = date.today().month
+	earliest = currMonth-6
+	for i in range(earliest,currMonth): 
+		if i>0 and i<13: 
+			labels.append(months[i])
+		elif i < 1: 
+			i += 12
+			labels.append(months[i])
+	values = []
+	for elem in labels:
+		added = False
+		for i in range (len(custMonthlySpending)): 
+			if custMonthlySpending[i]['month'] == elem: 
+				values.append(custMonthlySpending[i]['spent'])
+				added = True
+				break
+		if added == False: 
+			values.append(0)
+	maximumValue = max(values) + 10
+	return render_template('Customer-Track-Spending.html', labels = labels, values = values, yearSpend = yearSpend, max = maximumValue)
+
+@app.route('/Customer-Track-Spending-Custom', methods = ['GET', 'POST'])
+def customerSpendingCustom(): 
+	cursor = conn.cursor()
+	#print(request.form)
+	username = session['username']
+	start_date = request.form['start-date1']
+	#print(request.form)
+	end_date = request.form['end-date1']
+	getCustMonthlySpending = 'SELECT MONTHNAME(PurchaseDate) AS month, YEAR(PurchaseDate) AS year, SUM(soldPrice) as spent FROM ticket NATURAL JOIN purchasedfor WHERE CustomerEmail = %s AND PurchaseDate >= %s AND PurchaseDate <= %s GROUP BY MONTHNAME(PurchaseDate)'
+	cursor.execute(getCustMonthlySpending, (username, start_date, end_date))
+	custMonthlySpending = cursor.fetchall() 
+	labels = []
+	values = []
+	for elem in custMonthlySpending: 
+		date = str(elem['month']) + " " +str(elem['year'])
+		labels.append(date)
+		values.append(elem['spent'])
+	maximumValue = max(values) + 10
+	return render_template('Customer-Track-Spending-Custom.html', labels = labels, values = values, max = maximumValue)
 
 @app.route('/View-Flights')
 def viewFlightsPublic():
@@ -428,6 +481,32 @@ def viewOneWayFlightsPublic():
 
 @app.route('/Search-Round-Trip-Public', methods = ['GET', 'POST'])
 def viewRoundTripFlightsPublic(): 
+	source_city = request.form['source-city-two']
+	source_air = request.form['source-airport-two']
+	dest_city = request.form['destination-city-two']
+	dest_air = request.form['destination-airport-two']
+	dept_date = request.form['departure-date-two']
+	ret_date = request.form['return-date-two']
+	
+	cursor = conn.cursor()
+	twoWayFlights = 'SELECT f.AirlineName, f.FlightNumber, f.DepartureDate, f3.DepartureDate AS ReturnDate, f.DepartureTime, f3.DepartureTime AS ReturnTime, f.ArrivalDate, FlightStatus, COUNT(ticketID) as booked, numberOfSeats FROM flight as f LEFT JOIN purchasedfor AS p ON p.FlightNumber = f.FlightNumber AND p.DepartureDate = f.DepartureDate AND p.DepartureTime = f.DepartureTime INNER JOIN updates AS u ON u.FlightNumber = f.FlightNumber AND u.DepartureDate = f.DepartureDate AND u.DepartureTime = f.DepartureTime INNER JOIN airplane ON f.AirplaneID = airplane.AirplaneID INNER JOIN airport AS a1 ON a1.AirportName = f.DepartureAirport INNER JOIN airport AS a2 ON a2.AirportName = f.ArrivalAirport INNER JOIN flight AS f3 ON f.FlightNumber = f3.FlightNumber AND f.ArrivalAirport = f3.DepartureAirport WHERE f.FlightNumber IN (SELECT FlightNumber FROM flight as f2 GROUP BY FlightNumber HAVING COUNT(f2.FlightNumber) > 1) AND f3.DepartureDate > f.DepartureDate AND a1.AirportCity = %s AND f.DepartureAirport = %s AND a2.AirportCity = %s AND f.ArrivalAirport = %s AND f.DepartureDate = %s AND f3.DepartureDate = %s GROUP BY f.AirlineName, f.FlightNumber, f.DepartureDate, f.DepartureTime, f.ArrivalDate, FlightStatus, ReturnDate, ReturnTime HAVING COUNT(ticketID) < NumberOfSeats'
+	cursor.execute(twoWayFlights, (source_city, source_air, dest_city, dest_air, dept_date, ret_date))
+	data1 = cursor.fetchall()
+	cursor.close()
+	from datetime import date
+	today = date.today()
+	if dept_date < str(today): 
+		error = "Date is in the past"
+		data1 = ''
+		return render_template('Public-Two-Way-FLights.html',flights=data1, error = error)
+	elif (data1):
+		#print(data1)
+		#booked = data1['booked']
+		#numSeats = data1['numberOfSeats']
+		return render_template('Public-Two-Way-FLights.html', flights=data1)#, booked = booked, numSeats = numSeats)
+	else: 
+		error = "No Flights Available"
+		return render_template('Public-Two-Way-FLights.html',flights=data1, error = error)
 	pass 
 
 @app.route('/Search-Flights-Public')
@@ -556,7 +635,7 @@ def topCusts():
 	username = session['username']
 	cursor = conn.cursor()
 	#topCusts = 'SELECT customerEmail, SUM(CommissionAmount) AS commission FROM customer NATURAL JOIN ticket NATURAL JOIN creates WHERE agentemail = %s GROUP BY customerEmail ORDER BY commission DESC LIMIT 5'
-	topCustsTicket = 'SELECT customerEmail, COUNT(ticketID) AS tickets FROM customer NATURAL JOIN ticket NATURAL JOIN creates WHERE agentemail = %s AND PuchaseDate >= CURRENT_DATE - INTERVAL 6 MONTH  GROUP BY customerEmail ORDER BY COUNT(ticketID) DESC LIMIT 5'
+	topCustsTicket = 'SELECT customerEmail, COUNT(ticketID) AS tickets FROM customer NATURAL JOIN ticket NATURAL JOIN creates WHERE agentemail = %s AND PurchaseDate >= CURRENT_DATE - INTERVAL 6 MONTH  GROUP BY customerEmail ORDER BY COUNT(ticketID) DESC LIMIT 5'
 	cursor.execute(topCustsTicket, (username))
 	custsByTicket = cursor.fetchall()
 	#print(custsByTicket)
@@ -570,7 +649,7 @@ def topCusts():
 		values.append(value)
 	print(labels,values)
 
-	topCustsCommission = 'SELECT customerEmail, SUM(commissionAmount) AS commission FROM customer NATURAL JOIN ticket NATURAL JOIN creates WHERE agentemail = %s AND PuchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR  GROUP BY customerEmail ORDER BY SUM(commissionAmount) DESC LIMIT 5'
+	topCustsCommission = 'SELECT customerEmail, SUM(commissionAmount) AS commission FROM customer NATURAL JOIN ticket NATURAL JOIN creates WHERE agentemail = %s AND PurchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR  GROUP BY customerEmail ORDER BY SUM(commissionAmount) DESC LIMIT 5'
 	cursor.execute(topCustsCommission, (username))
 	custsByCommission = cursor.fetchall()
 	custs = []
@@ -589,7 +668,7 @@ def topCusts():
 def view_commissions_main(): 
 	username = session['username']
 	cursor = conn.cursor() 
-	statistics = 'SELECT SUM(commissionAmount) AS totalcom, SUM(commissionAmount)/COUNT(*) as avgcom, COUNT(ticketID) AS numtickets FROM creates NATURAL JOIN ticket WHERE AgentEmail = %s AND CURRENT_DATE - 30 <= puchaseDate'
+	statistics = 'SELECT SUM(commissionAmount) AS totalcom, SUM(commissionAmount)/COUNT(*) as avgcom, COUNT(ticketID) AS numtickets FROM creates NATURAL JOIN ticket WHERE AgentEmail = %s AND CURRENT_DATE - 30 <= purchaseDate'
 	cursor.execute(statistics, (username))
 	comStats = cursor.fetchone() 
 	print(comStats)
@@ -602,7 +681,7 @@ def bookingAgentDatesCommissions():
 	end_date = request.form['end-date']
 	username = session['username']
 	cursor = conn.cursor() 
-	statistics = 'SELECT SUM(commissionAmount) AS totalcom, SUM(commissionAmount)/COUNT(*) as avgcom, COUNT(ticketID) AS numtickets FROM creates NATURAL JOIN ticket WHERE AgentEmail = %s AND PuchaseDate >= %s AND PuchaseDate <= %s'
+	statistics = 'SELECT SUM(commissionAmount) AS totalcom, SUM(commissionAmount)/COUNT(*) as avgcom, COUNT(ticketID) AS numtickets FROM creates NATURAL JOIN ticket WHERE AgentEmail = %s AND PurchaseDate >= %s AND PurchaseDate <= %s'
 	cursor.execute(statistics, (username, start_date, end_date))
 	comStats = cursor.fetchone() 
 	cursor.close()
@@ -779,13 +858,13 @@ def airline_staff_view_flight_customers():
 @app.route('/Airline-Staff-Top-Agents-Frequent-Customers')
 def top_agent_frequent_cust(): 
 	cursor = conn.cursor()
-	findTopAgentMonth = 'SELECT AgentEmail, COUNT(*) AS ticketSold FROM ticket NATURAL JOIN creates WHERE puchaseDate >= CURRENT_DATE - INTERVAL 1 MONTH GROUP BY AgentEmail ORDER BY COUNT(AgentID) DESC LIMIT 5'
+	findTopAgentMonth = 'SELECT AgentEmail, COUNT(*) AS ticketSold FROM ticket NATURAL JOIN creates WHERE purchaseDate >= CURRENT_DATE - INTERVAL 1 MONTH GROUP BY AgentEmail ORDER BY COUNT(AgentID) DESC LIMIT 5'
 	cursor.execute(findTopAgentMonth)
 	topAgentMonth = cursor.fetchall()
-	findTopAgentYear = 'SELECT AgentEmail, COUNT(*) AS ticketSold FROM ticket NATURAL JOIN creates WHERE puchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR GROUP BY AgentEmail ORDER BY COUNT(AgentID) DESC LIMIT 5'
+	findTopAgentYear = 'SELECT AgentEmail, COUNT(*) AS ticketSold FROM ticket NATURAL JOIN creates WHERE purchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR GROUP BY AgentEmail ORDER BY COUNT(AgentID) DESC LIMIT 5'
 	cursor.execute(findTopAgentYear)
 	topAgentYear = cursor.fetchall()
-	findTopAgentComsYear = 'SELECT AgentEmail, SUM(commissionAmount) AS commission FROM ticket NATURAL JOIN creates WHERE puchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR GROUP BY AgentEmail ORDER BY commission DESC LIMIT 5'
+	findTopAgentComsYear = 'SELECT AgentEmail, SUM(commissionAmount) AS commission FROM ticket NATURAL JOIN creates WHERE purchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR GROUP BY AgentEmail ORDER BY commission DESC LIMIT 5'
 	cursor.execute(findTopAgentComsYear)
 	topAgentYearComs = cursor.fetchall()
 	username = session['username']
@@ -981,7 +1060,7 @@ def view_specific_flight_rating():
 def airlineStaffRevenue(): 
 	cursor = conn.cursor()
 	#returns indirect, direct
-	getRevenueMonth = 'SELECT SUM(SoldPrice) as sale FROM ticket WHERE AgentID <> %s AND PuchaseDate >= CURRENT_DATE - INTERVAL 1 MONTH UNION SELECT SUM(SoldPrice) as sale FROM ticket WHERE AgentID = %s AND PuchaseDate >= CURRENT_DATE - INTERVAL 1 MONTH'
+	getRevenueMonth = 'SELECT SUM(SoldPrice) as sale FROM ticket WHERE AgentID <> %s AND PurchaseDate >= CURRENT_DATE - INTERVAL 1 MONTH UNION SELECT SUM(SoldPrice) as sale FROM ticket WHERE AgentID = %s AND PurchaseDate >= CURRENT_DATE - INTERVAL 1 MONTH'
 	null = 'NULL'
 	cursor.execute(getRevenueMonth, (null, null))
 	monthSales = cursor.fetchall()
@@ -991,16 +1070,25 @@ def airlineStaffRevenue():
 	monthIndirectSales = monthSales[0]['sale']
 	monthDirectSales = monthSales[1]['sale']
 
-	data1 = ['indirect sale', monthIndirectSales, 'blue']
-	data2 = ['direct sale', monthDirectSales, 'red']
+	data1 = ['indirect sale', monthIndirectSales, 'green']
+	data2 = ['direct sale', monthDirectSales, 'blue']
 	set.append(data1)
 	set.append(data2)
-	print(set)
+	#print(set)
 
-	getRevenueYear = 'SELECT SUM(SoldPrice) as sale FROM ticket WHERE AgentID <> %s AND PuchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR UNION SELECT SUM(SoldPrice) as sale FROM ticket WHERE AgentID = %s AND PuchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR'
+	getRevenueYear = 'SELECT SUM(SoldPrice) as sale FROM ticket WHERE AgentID <> %s AND PurchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR UNION SELECT SUM(SoldPrice) as sale FROM ticket WHERE AgentID = %s AND PurchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR'
+	yearSet = []
 	cursor.execute(getRevenueYear, (null, null))
 	yearSales = cursor.fetchall()
-	return render_template('Airline-Staff-Compare-Revenue.html', set = set, max = 100)
+	yearIndirectSales = yearSales[0]['sale']
+	yearDirectSales = yearSales[1]['sale']
+
+	year1 = ['indirect sale', yearIndirectSales, 'green']
+	year2 = ['direct sale', yearDirectSales, 'blue']
+	yearSet.append(year1)
+	yearSet.append(year2)
+
+	return render_template('Airline-Staff-Compare-Revenue.html', set = set, max = 100, yearSet = yearSet)
 	
 
 '''
