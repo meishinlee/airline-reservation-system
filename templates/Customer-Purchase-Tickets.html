@@ -31,6 +31,9 @@
     <section class="u-align-left u-clearfix u-image u-shading u-section-1" id="sec-0b77" data-image-width="1280" data-image-height="720">
       <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
         <h1 class="u-align-center u-text u-text-body-alt-color u-text-1">Purchase Flight Tickets </h1>
+        {% if error %}
+                <p class="error"><strong>Message:</strong> {{error}}</p>
+              {% endif %}
         <div class="u-clearfix u-expanded-width u-layout-wrap u-layout-wrap-1">
           <div class="u-layout">
             <div class="u-layout-row">

@@ -89,7 +89,7 @@ def customerLoginAuth():
 	#cursor used to send queries
 	cursor = conn.cursor()
 	#executes query
-	query = 'SELECT CustomerName, CustomerEmail, CustomerPassword FROM customer WHERE CustomerEmail = %s and CustomerPassword = md5(%s)'
+	query = 'SELECT CustomerEmail, CustomerPassword FROM customer WHERE CustomerEmail = %s and CustomerPassword = md5(%s)'
 	cursor.execute(query, (username, password))
 	#stores the results in a variable
 	data = cursor.fetchone()
@@ -131,13 +131,25 @@ def customerHome():
 def viewCustomerFlights():
 	username = session['username']
 	cursor = conn.cursor()
-	query = 'SELECT AirlineName, FlightNumber, DepartureDate, DepartureTime, ArrivalDate, ArrivalTime, FlightStatus FROM Flight NATURAL JOIN updates NATURAL JOIN purchasedfor NATURAL JOIN ticket NATURAL JOIN customer WHERE CustomerEmail = %s ORDER BY DepartureDate LIMIT 5'
+	query = 'SELECT AirlineName, FlightNumber, DepartureDate, DepartureTime, ArrivalDate, ArrivalTime, FlightStatus FROM Flight NATURAL JOIN updates NATURAL JOIN purchasedfor NATURAL JOIN ticket NATURAL JOIN customer WHERE CustomerEmail = %s AND DepartureDate > CURRENT_DATE OR (DepartureDate = CURRENT_DATE AND DepartureTime > CURRENT_TIME) ORDER BY DepartureDate'
 	cursor.execute(query, (username))
 	data1 = cursor.fetchall() 
 	for each in data1:
 		print(each['AirlineName'])
 		cursor.close()
 	return render_template('View-Customer-Flights.html', custFlights=data1)
+
+@app.route('/View-Customer-Flights-Variation')
+def viewPastFlights(): 
+	username = session['username']
+	cursor = conn.cursor()
+	query = 'SELECT AirlineName, FlightNumber, DepartureDate, DepartureTime, ArrivalDate, ArrivalTime, FlightStatus FROM Flight NATURAL JOIN updates NATURAL JOIN purchasedfor NATURAL JOIN ticket NATURAL JOIN customer WHERE CustomerEmail = %s AND DepartureDate < CURRENT_DATE OR (DepartureDate = CURRENT_DATE AND DepartureTime < CURRENT_TIME) ORDER BY DepartureDate'
+	cursor.execute(query, (username))
+	data1 = cursor.fetchall() 
+	for each in data1:
+		print(each['AirlineName'])
+		cursor.close()
+	return render_template('View-Customer-Flights-Variation.html', custFlights=data1)
 
 @app.route('/Customer-Search-Flights') #needs a query for this!! 
 def searchCustomerFlights(): 
@@ -339,10 +351,13 @@ def custPurchaseTwoWayFlight():
 	flight1Seats = cursor.fetchone()
 	print(flight1Seats)
 	flight1SeatsBooked, flight1TotalSeats = flight1Seats['booked'], flight1Seats['numberOfSeats']
+	from datetime import date
+	if flight1SeatsBooked/flight2TotalSeats == 1 or flight1Seats['DepartureDate'] < date.today(): 
+		error = "Flight fully booked or Departure Date is in the Past"
+		return render_template('Customer-Purchase-Tickets.html', error = error)
 	cursor.execute(checkFlightSeats, (flight_number, return_date, return_time))
 	flight2Seats = cursor.fetchone()
 	flight2SeatsBooked, flight2TotalSeats = flight2Seats['booked'], flight2Seats['numberOfSeats']
-
 
 	#don't need the check flights has seats, because we checked in the previous query
 	checkFlightPrice = 'SELECT * FROM flight WHERE FlightNumber = %s AND DepartureDate = %s AND DepartureTime =%s'
@@ -558,16 +573,18 @@ def bookingAgentHome():
 
 @app.route('/Booking-Agent-View-Customer-Flights-first')
 def bookingAgentViewCustFlights(): 
+	'''
 	username = 0
 	cursor = conn.cursor()
 	#executes query
 	query = 'SELECT AirlineName, FlightNumber, DepartureDate, ArrivalDate, FlightStatus FROM ticket NATURAL JOIN purchasedfor NATURAL JOIN customer NATURAL JOIN flight NATURAL JOIN updates WHERE CustomerEmail = %s'
 	cursor.execute(query, (username))
 	#stores the results in a variable
-	data1 = cursor.fetchall()
+	data1 = cursor.fetchall() #this should be empty 
 	#use fetchall() if you are expecting more than 1 data row
 	cursor.close()
 	error = None
+	'''
 	return render_template('Booking-Agent-View-Customer-Flights-first.html')
 
 @app.route('/Booking-Agent-View-Customer-Flights-second', methods=['GET','POST'])
@@ -872,7 +889,7 @@ def top_agent_frequent_cust():
 	cursor.execute(staffAirline, (username))
 	staffAirlineName = cursor.fetchone()['AirlineName']
 	print(staffAirlineName)
-	findTopCustomer = 'SELECT CustomerEmail, COUNT(*) AS numFlights FROM ticket WHERE AirlineName = %s GROUP BY CustomerEmail ORDER BY numFlights DESC LIMIT 1'
+	findTopCustomer = 'SELECT CustomerEmail, COUNT(*) AS numFlights FROM ticket WHERE AirlineName = %s AND purchaseDate >= CURRENT_DATE - INTERVAL 1 YEAR GROUP BY CustomerEmail ORDER BY numFlights DESC LIMIT 1'
 	cursor.execute(findTopCustomer, (staffAirlineName))
 	topCustomer = cursor.fetchone()
 	cursor.close()
@@ -1131,7 +1148,7 @@ def airlineStaffViewReportCustom():
 	start_date = request.form['start-date']
 	end_date = request.form['end-date']
 	cursor = conn.cursor()
-	getTicketAmount = 'SELECT COUNT(TicketID) AS tickets, MONTHNAME(PurchaseDate) AS month, YEAR(PurchaseDate) AS year FROM ticket WHERE PurchaseDate >= %s AND PurchaseDate <= %s GROUP BY month'
+	getTicketAmount = 'SELECT COUNT(TicketID) AS tickets, MONTHNAME(PurchaseDate) AS month, YEAR(PurchaseDate) AS year FROM ticket WHERE PurchaseDate >= %s AND PurchaseDate <= %s GROUP BY month, year'
 	cursor.execute(getTicketAmount, (start_date, end_date))
 	data = cursor.fetchall()
 	labels = []
@@ -1143,6 +1160,7 @@ def airlineStaffViewReportCustom():
 		
 	maximumValue = max(values) + 1
 	return render_template('Airline-Staff-View-Reports-Custom.html', labels = labels, values = values, max = maximumValue)
+
 '''
 @app.route('/Airline-Staff-View-Agents-Customers')
 def airline_staff_view_people():
