@@ -12,7 +12,7 @@ app = Flask(__name__)
 conn = pymysql.connect(host='localhost',
                        user='root',
                        password='',
-                       db='air ticket reservation system',
+                       db='1projecttest',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 
@@ -47,7 +47,7 @@ def registerAuth():
 	passportExp = request.form['passport-expiration']
 	passportCountry = request.form['passport-country']
 	dateOfBirth = request.form['date-of-birth']
-
+	print(request.form)
 	#cursor used to send queries
 	cursor = conn.cursor()
 	#executes query
@@ -753,6 +753,7 @@ def airline_staff_register():
 #Authenticates the register
 @app.route('/AirlineStaffRegisterAuth', methods=['GET', 'POST'])
 def airlineStaffRegisterAuth():
+	print(request.form)
 	#grabs information from the forms
 	fname = request.form['first-name']
 	lname = request.form['last-name']
@@ -760,6 +761,9 @@ def airlineStaffRegisterAuth():
 	password = request.form['password']
 	dob = request.form['date-of-birth']
 	airline = request.form['airline']
+	phone_numbers = request.form['phone-numbers']
+	staffPhoneNumbersList = phone_numbers.split(";")
+	print(staffPhoneNumbersList)
 
 	#cursor used to send queries
 	cursor = conn.cursor()
@@ -777,6 +781,15 @@ def airlineStaffRegisterAuth():
 	else:
 		ins = 'INSERT INTO airlinestaff VALUES(%s, md5(%s), %s, %s, %s, %s)'
 		cursor.execute(ins, (username, password, fname, lname, dob, airline))
+		for elem in staffPhoneNumbersList: 
+			getPhoneNumber = 'SELECT * FROM phonenumber WHERE Username = %s AND AirlineStaffPhoneNumber = %s'
+			cursor.execute(getPhoneNumber, (username, elem.strip()))
+			data = cursor.fetchone()
+			if(data): 
+				pass 
+			else: 
+				insPhoneNumber = 'INSERT INTO phonenumber VALUES (%s, %s)'
+				cursor.execute(insPhoneNumber, (username, elem.strip()))
 		conn.commit()
 		cursor.close()
 		return render_template('index.html')
