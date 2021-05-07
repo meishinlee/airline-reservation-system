@@ -60,12 +60,12 @@
                 <td class="u-table-cell u-table-cell-1">Rating</td>
                 <td class="u-table-cell">Comment</td>
               </tr>
+              {% for line in flights %}
               <tr style="height: 69px;">
-                {% for line in flights %}
                 <td class="u-table-cell">{{line['Rate']}}</td>
                 <td class="u-table-cell">{{line['CustomerComment']}}</td>
-                {% endfor %}
               </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>

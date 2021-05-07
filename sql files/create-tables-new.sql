@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS Suggested(
     FlightNumber int(5), 
     DepartureDate date, 
     DepartureTime time, 
-    CustomerComment text, #can rate w/o comment 
+    CustomerComment text DEFAULT NULL, #can rate w/o comment 
     Rate float(2,1) NOT NULL, 
     PRIMARY KEY (CustomerEmail, FlightNumber, DepartureDate, DepartureTime), 
     FOREIGN KEY (CustomerEmail) REFERENCES Customer(CustomerEmail) 
@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS Ticket(
     AirlineName varchar(50) NOT NULL, 
     FlightNumber int(5) NOT NULL, 
     SoldPrice float(6, 2) NOT NULL, 
-    PuchaseDate date NOT NULL, 
+    PurchaseDate date NOT NULL, 
     PurchasedTime time NOT NULL, 
     AgentID varchar(20), 
     PRIMARY KEY (TicketID), 
