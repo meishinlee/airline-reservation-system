@@ -1041,13 +1041,13 @@ def add_airplane():
 	else: 
 		addAirplane = 'INSERT INTO airplane VALUES(%s, %s, %s)'
 		cursor.execute(addAirplane, (airline_name, airplane_id, num_seats))
-		getAirplanes = 'SELECT * FROM airplane WHERE airline = %s'
+		getAirplanes = 'SELECT * FROM airplane WHERE airlineName = %s'
 		cursor.execute(getAirplanes, (airline_name))
 		airplanes = cursor.fetchall()
 		conn.commit()
 		cursor.close()
 		error = "Airplane added successfully"
-		return render_template('Airplanes-in-Airline.html', airline_name = airline_name, airplanes = airplanes)
+		return render_template('Airplanes-in-Airline.html', airline_name = airline_name, airplanes = airplanes, airlineName = airline_name)
 
 @app.route('/Add-Airport', methods = ['GET', 'POST'])
 def add_airport(): 
