@@ -899,9 +899,22 @@ def view_flights_destination_airport():
 		error = "No flights found"
 		return render_template('Airline-Staff-View-Flights-Custom.html', flights = data, error = error)
 
-@app.route('/Airline-Staff-View-Flights-Customers')
+@app.route('/Airline-Staff-View-Flight-Customers', methods = ['GET', 'POST'])
 def airline_staff_view_flight_customers(): 
-	return 
+	username = session['username']
+	cursor = conn.cursor()
+	flightNumber = request.form['flight-number']
+	departure_date = request.form['departure-date']
+	departure_time = request.form['departure-time']
+	findAirlineName = 'SELECT AirlineName FROM airlinestaff WHERE Username = %s'
+	cursor.execute(findAirlineName, (username))
+	airlineName = cursor.fetchone()['AirlineName']
+	findCustomers = 'SELECT DISTINCT customerEmail FROM ticket NATURAL JOIN purchasedfor WHERE FlightNumber = %s AND DepartureDate = %s AND DepartureTime = %s AND AirlineName = %s'
+	cursor = conn.cursor()
+	cursor.execute(findCustomers, (flightNumber, departure_date, departure_time, airlineName))
+	customers = cursor.fetchall()
+	cursor.close()
+	return render_template('Airline-Staff-View-Customer-On-Flight.html', customers = customers, flightNumber = flightNumber, dept_date = departure_date, dept_time = departure_time)
 
 @app.route('/Airline-Staff-Top-Agents-Frequent-Customers')
 def top_agent_frequent_cust(): 
