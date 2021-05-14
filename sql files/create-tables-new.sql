@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS AirlineStaff(
 
 CREATE TABLE IF NOT EXISTS PhoneNumber(
     Username varchar(50), 
-    AirlineStaffPhoneNumber int(10) NOT NULL, 
+    AirlineStaffPhoneNumber varchar(11) NOT NULL, 
     PRIMARY KEY (Username, AirlineStaffPhoneNumber), 
     FOREIGN KEY (Username) REFERENCES AirlineStaff(Username)
     ON DELETE CASCADE 
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS Customer(
     Street varchar(50) NOT NULL, 
     City varchar(50) NOT NULL, 
     State varchar(50) NOT NULL, 
-    CustomerPhoneNumber varchar(10) NOT NULL,
+    CustomerPhoneNumber varchar(11) NOT NULL,
     PassportNumber varchar(8) NOT NULL, 
     PassportExpiration date NOT NULL, 
     PassportCountry varchar(50) NOT NULL, 
@@ -207,7 +207,7 @@ CREATE TABLE IF NOT EXISTS Creates(
     ); 
 
 CREATE TABLE IF NOT EXISTS CardInfo(
-    CardNumber int(10), 
+    CardNumber varchar(20), 
     CardType varchar(6) NOT NULL, 
     CardName varchar(50) NOT NULL, 
     ExpirationDate date NOT NULL, 
@@ -215,7 +215,7 @@ CREATE TABLE IF NOT EXISTS CardInfo(
     );
 
 CREATE TABLE IF NOT EXISTS ProvidesPersonalInfo(
-    CardNumber int(10),
+    CardNumber varchar(20),
     CustomerEmail varchar(50), 
     PRIMARY KEY (CardNumber, CustomerEmail), 
     FOREIGN KEY (CardNumber) REFERENCES CardInfo(CardNumber)
@@ -227,7 +227,7 @@ CREATE TABLE IF NOT EXISTS ProvidesPersonalInfo(
     );
 
 CREATE TABLE IF NOT EXISTS PaymentMethod(
-    CardNumber int(10), 
+    CardNumber varchar(20), 
     TicketID varchar(50),
     PRIMARY KEY (CardNumber, TicketID),
     FOREIGN KEY (CardNumber) REFERENCES cardinfo(CardNumber)
