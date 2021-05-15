@@ -12,7 +12,7 @@ app = Flask(__name__)
 conn = pymysql.connect(host='localhost',
                        user='root',
                        password='',
-                       db='6projecttest',
+                       db='7projecttest',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 
@@ -469,9 +469,11 @@ def custEnterCardInfo():
 		insPaymentMethod = 'INSERT INTO paymentmethod VALUES (%s, %s)'
 		cursor.execute(insPaymentMethod, (card_num, ticketNumber))
 		#query for round trip (flight 2)
-		queryRoundTripFlight = 'SELECT * FROM flight WHERE FlightNumber = %s AND DepartureDate <> %s AND DepartureTime <> %s'
+		queryRoundTripFlight = 'SELECT * FROM flight WHERE FlightNumber = %s AND (DepartureDate <> %s OR DepartureTime <> %s)'
 		cursor.execute(queryRoundTripFlight, (flight_number, dept_date, dept_time))
 		complement = cursor.fetchone()
+		print(flight_number, dept_date, dept_time)
+		print(complement)
 		roundDeptDate = complement['DepartureDate']
 		roundDeptTime = complement['DepartureTime']
 		#ins into purchased for
@@ -514,7 +516,7 @@ def viewRoundTripFlightsPublic():
 	ret_date = request.form['return-date-two']
 	
 	cursor = conn.cursor()
-	twoWayFlights = 'SELECT f.AirlineName, f.FlightNumber, f.DepartureDate, f3.DepartureDate AS ReturnDate, f.DepartureTime, f3.DepartureTime AS ReturnTime, f.ArrivalDate, FlightStatus, COUNT(ticketID) as booked, numberOfSeats FROM flight as f LEFT JOIN purchasedfor AS p ON p.FlightNumber = f.FlightNumber AND p.DepartureDate = f.DepartureDate AND p.DepartureTime = f.DepartureTime INNER JOIN updates AS u ON u.FlightNumber = f.FlightNumber AND u.DepartureDate = f.DepartureDate AND u.DepartureTime = f.DepartureTime INNER JOIN airplane ON f.AirplaneID = airplane.AirplaneID INNER JOIN airport AS a1 ON a1.AirportName = f.DepartureAirport INNER JOIN airport AS a2 ON a2.AirportName = f.ArrivalAirport INNER JOIN flight AS f3 ON f.FlightNumber = f3.FlightNumber AND f.ArrivalAirport = f3.DepartureAirport WHERE f.FlightNumber IN (SELECT FlightNumber FROM flight as f2 GROUP BY FlightNumber HAVING COUNT(f2.FlightNumber) > 1) AND f3.DepartureDate > f.DepartureDate AND a1.AirportCity = %s AND f.DepartureAirport = %s AND a2.AirportCity = %s AND f.ArrivalAirport = %s AND f.DepartureDate = %s AND f3.DepartureDate = %s AND DepartureDate > CURRENT_DATE GROUP BY f.AirlineName, f.FlightNumber, f.DepartureDate, f.DepartureTime, f.ArrivalDate, FlightStatus, ReturnDate, ReturnTime HAVING COUNT(ticketID) < NumberOfSeats'
+	twoWayFlights = 'SELECT f.AirlineName, f.FlightNumber, f.DepartureDate, f3.DepartureDate AS ReturnDate, f.DepartureTime, f3.DepartureTime AS ReturnTime, f.ArrivalDate, FlightStatus, COUNT(ticketID) as booked, numberOfSeats FROM flight as f LEFT JOIN purchasedfor AS p ON p.FlightNumber = f.FlightNumber AND p.DepartureDate = f.DepartureDate AND p.DepartureTime = f.DepartureTime INNER JOIN updates AS u ON u.FlightNumber = f.FlightNumber AND u.DepartureDate = f.DepartureDate AND u.DepartureTime = f.DepartureTime INNER JOIN airplane ON f.AirplaneID = airplane.AirplaneID INNER JOIN airport AS a1 ON a1.AirportName = f.DepartureAirport INNER JOIN airport AS a2 ON a2.AirportName = f.ArrivalAirport INNER JOIN flight AS f3 ON f.FlightNumber = f3.FlightNumber AND f.ArrivalAirport = f3.DepartureAirport WHERE f.FlightNumber IN (SELECT FlightNumber FROM flight as f2 GROUP BY FlightNumber HAVING COUNT(f2.FlightNumber) > 1) AND f3.DepartureDate > f.DepartureDate AND a1.AirportCity = %s AND f.DepartureAirport = %s AND a2.AirportCity = %s AND f.ArrivalAirport = %s AND f.DepartureDate = %s AND f3.DepartureDate = %s AND f.DepartureDate > CURRENT_DATE GROUP BY f.AirlineName, f.FlightNumber, f.DepartureDate, f.DepartureTime, f.ArrivalDate, FlightStatus, ReturnDate, ReturnTime HAVING COUNT(ticketID) < NumberOfSeats'
 	cursor.execute(twoWayFlights, (source_city, source_air, dest_city, dest_air, dept_date, ret_date))
 	data1 = cursor.fetchall()
 	cursor.close()
