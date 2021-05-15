@@ -106,7 +106,7 @@ INSERT INTO paymentmethod VALUES ('1111-2222-3333-5555', 3);
 INSERT INTO ticket VALUES (4, 'user1@nyu.edu', 'Air China', 104, 300, '2021-03-21', '11:55:55', "NULL");
 INSERT INTO purchasedfor VALUES (4, 104, '2021-05-14', '13:25:25');
 #INSERT INTO cardinfo VALUES ('1111-2222-3333-5555', 'credit', 'User 2', '2023-03-01'); #already added as user1
-INSERT INTO providespersonalinfo VALUES ('1111-2222-3333-5555', 'user1@nyu.edu');
+#INSERT INTO providespersonalinfo VALUES ('1111-2222-3333-5555', 'user1@nyu.edu');
 INSERT INTO paymentmethod VALUES ('1111-2222-3333-5555', 4);
 
 #ticket 5 (MustCheck)
@@ -118,3 +118,111 @@ INSERT INTO purchasedfor VALUES (5, 104, '2021-05-14', '13:25:25');
 INSERT INTO paymentmethod VALUES ('1111-2222-3333-4444', 5);
 
 #ticket 6
+INSERT INTO ticket VALUES (6, 'testcustomer@nyu.edu', 'Air China', 106, 350, '2021-03-05', '11:55:55', 'ctrip@agent.com');
+INSERT INTO creates VALUES ('ctrip@agent.com', 6, 35);
+INSERT INTO purchasedfor VALUES (6, 106, '2021-03-12', '13:25:25');
+#INSERT INTO cardinfo VALUES ('1111-2222-3333-4444', 'credit', 'Test Customer 1', '2023-03-01');
+#INSERT INTO providespersonalinfo VALUES ('1111-2222-3333-4444', 'testcustomer@nyu.edu');
+INSERT INTO paymentmethod VALUES ('1111-2222-3333-4444', 6);
+
+#ticket 7
+INSERT INTO ticket VALUES (7, 'user3@nyu.edu', 'Air China', 106, 350, '2021-02-03', '11:55:55', 'NULL');
+#INSERT INTO creates VALUES ('ctrip@agent.com', 7, 35);
+INSERT INTO purchasedfor VALUES (7, 106, '2021-03-12', '13:25:25');
+#INSERT INTO cardinfo VALUES ('1111-2222-3333-5555', 'credit', 'User 3', '2023-03-01');
+INSERT INTO providespersonalinfo VALUES ('1111-2222-3333-5555', 'user3@nyu.edu');
+INSERT INTO paymentmethod VALUES ('1111-2222-3333-5555', 7);
+
+#ticket 8 
+INSERT INTO ticket VALUES (8, 'user3@nyu.edu', 'Air China', 839, 300, '2020-07-03', '11:55:55', 'NULL');
+#INSERT INTO creates VALUES ('ctrip@agent.com', 8, 35);
+INSERT INTO purchasedfor VALUES (8, 839, '2020-07-12', '13:25:25');
+#INSERT INTO cardinfo VALUES ('1111-2222-3333-5555', 'credit', 'User 3', '2023-03-01');
+#INSERT INTO providespersonalinfo VALUES ('1111-2222-3333-5555', 'user3@nyu.edu');
+INSERT INTO paymentmethod VALUES ('1111-2222-3333-5555', 8);
+
+#ticket 9
+INSERT INTO ticket VALUES (9, 'user3@nyu.edu', 'Air China', 102, 360, '2021-02-03', '11:55:55', 'NULL');
+#INSERT INTO creates VALUES ('ctrip@agent.com', 9, 35);
+INSERT INTO purchasedfor VALUES (9, 102, '2021-04-12', '13:25:25');
+#INSERT INTO cardinfo VALUES ('1111-2222-3333-5555', 'credit', 'User 3', '2023-03-01');
+#INSERT INTO providespersonalinfo VALUES ('1111-2222-3333-5555', 'user3@nyu.edu');
+INSERT INTO paymentmethod VALUES ('1111-2222-3333-5555', 9);
+
+#ticket 11
+INSERT INTO ticket VALUES (11, 'user3@nyu.edu', 'Air China', 134, 300, '2020-07-23', '11:55:55', 'expedia@agent.com');
+INSERT INTO creates VALUES ('expedia@agent.com', 11, 30);
+INSERT INTO purchasedfor VALUES (11, 134, '2021-02-12', '13:25:25');
+#INSERT INTO cardinfo VALUES ('1111-2222-3333-5555', 'credit', 'User 3', '2023-03-01');
+#INSERT INTO providespersonalinfo VALUES ('1111-2222-3333-5555', 'user3@nyu.edu');
+INSERT INTO paymentmethod VALUES ('1111-2222-3333-5555', 11);
+
+#ticket 12
+INSERT INTO ticket VALUES (12, 'testcustomer@nyu.edu', 'Air China', 715, 500, '2021-03-05', '11:55:55', 'ctrip@agent.com');
+INSERT INTO creates VALUES ('ctrip@agent.com', 12, 50);
+INSERT INTO purchasedfor VALUES (12, 715, '2021-04-28', '10:25:25');
+#INSERT INTO cardinfo VALUES ('1111-2222-3333-4444', 'credit', 'Test Customer 1', '2023-03-01');
+#INSERT INTO providespersonalinfo VALUES ('1111-2222-3333-4444', 'testcustomer@nyu.edu');
+INSERT INTO paymentmethod VALUES ('1111-2222-3333-4444', 12);
+
+#ticket 14
+INSERT INTO ticket VALUES (14, 'user3@nyu.edu', 'Air China', 206, 400, '2021-05-05', '11:55:55', 'ctrip@agent.com');
+INSERT INTO creates VALUES ('ctrip@agent.com', 14, 40);
+INSERT INTO purchasedfor VALUES (14, 206, '2021-06-12', '13:25:25');
+#INSERT INTO cardinfo VALUES ('1111-2222-3333-5555', 'credit', 'user 3', '2023-03-01');
+#INSERT INTO providespersonalinfo VALUES ('1111-2222-3333-5555', 'user3@nyu.edu');
+INSERT INTO paymentmethod VALUES ('1111-2222-3333-5555', 14);
+
+#ticket 15
+INSERT INTO ticket VALUES (15, 'user1@nyu.edu', 'Air China', 206, 400, '2021-06-06', '11:55:55', "NULL");
+INSERT INTO purchasedfor VALUES (15, 206, '2021-06-12', '13:25:25');
+#INSERT INTO cardinfo VALUES ('1111-2222-3333-5555', 'credit', 'User 1', '2023-03-01');
+#INSERT INTO providespersonalinfo VALUES ('1111-2222-3333-5555', 'user1@nyu.edu');
+INSERT INTO paymentmethod VALUES ('1111-2222-3333-5555', 15);
+
+#ticket 16
+INSERT INTO ticket VALUES (16, 'user2@nyu.edu', 'Air China', 206, 400, '2021-04-19', '11:55:55', 'NULL');
+#INSERT INTO creates VALUES ('ctrip@agent.com', 16, 40);
+INSERT INTO purchasedfor VALUES (16, 206, '2021-06-12', '13:25:25');
+#INSERT INTO cardinfo VALUES ('1111-2222-3333-5555', 'credit', 'user 2', '2023-03-01');
+#INSERT INTO providespersonalinfo VALUES ('1111-2222-3333-5555', 'user2@nyu.edu');
+INSERT INTO paymentmethod VALUES ('1111-2222-3333-5555', 16);
+
+#ticket 17
+INSERT INTO ticket VALUES (17, 'user1@nyu.edu', 'Air China', 207, 300, '2021-03-11', '11:55:55', "ctrip@agent.com");
+INSERT INTO creates VALUES ('ctrip@agent.com', 17, 30);
+INSERT INTO purchasedfor VALUES (17, 207, '2021-07-12', '13:25:25');
+#INSERT INTO cardinfo VALUES ('1111-2222-3333-5555', 'credit', 'User 1', '2023-03-01');
+#INSERT INTO providespersonalinfo VALUES ('1111-2222-3333-5555', 'user1@nyu.edu');
+INSERT INTO paymentmethod VALUES ('1111-2222-3333-5555', 17);
+
+#ticket 18 
+INSERT INTO ticket VALUES (18, 'testcustomer@nyu.edu', 'Air China', 207, 300, '2021-04-25', '11:55:55', "ctrip@agent.com");
+INSERT INTO creates VALUES ('ctrip@agent.com', 18, 30);
+INSERT INTO purchasedfor VALUES (18, 207, '2021-07-12', '13:25:25');
+#INSERT INTO cardinfo VALUES ('1111-2222-3333-4444', 'credit', 'Test Customer 1', '2023-03-01');
+#INSERT INTO providespersonalinfo VALUES ('1111-2222-3333-4444', 'testcustomer@nyu.edu');
+INSERT INTO paymentmethod VALUES ('1111-2222-3333-4444', 18);
+
+#ticket 19 
+INSERT INTO ticket VALUES (19, 'user1@nyu.edu', 'Air China', 296, 3000, '2021-05-04', '11:55:55', 'expedia@agent.com');
+INSERT INTO creates VALUES ('expedia@agent.com', 19, 300);
+INSERT INTO purchasedfor VALUES (19, 296, '2021-06-01', '13:25:25');
+#INSERT INTO cardinfo VALUES ('1111-2222-3333-5555', 'credit', 'User 1', '2023-03-01');
+#INSERT INTO providespersonalinfo VALUES ('1111-2222-3333-5555', 'user1@nyu.edu');
+INSERT INTO paymentmethod VALUES ('1111-2222-3333-5555', 19);
+
+#ticket 20
+INSERT INTO ticket VALUES (20, 'testcustomer@nyu.edu', 'Air China', 296, 3000, '2021-02-12', '11:55:55', 'NULL');
+#INSERT INTO creates VALUES ('expedia@agent.com', 20, 300);
+INSERT INTO purchasedfor VALUES (20, 296, '2021-06-01', '13:25:25');
+#INSERT INTO cardinfo VALUES ('1111-2222-3333-4444', 'credit', 'Test Customer 1', '2023-03-01');
+#INSERT INTO providespersonalinfo VALUES ('1111-2222-3333-4444', 'testcustomer@nyu.edu');
+INSERT INTO paymentmethod VALUES ('1111-2222-3333-4444', 20);
+
+#Rate/Comments
+INSERT INTO suggested VALUES ('testcustomer@nyu.edu', 102, '2021-04-12', '13:25:25', 'Very Comfortable', 4);
+INSERT INTO suggested VALUES ('user1@nyu.edu', 102, '2021-04-12', '13:25:25', 'Relaxing, check-in and onboarding very professional', 5);
+INSERT INTO suggested VALUES ('user2@nyu.edu', 102, '2021-04-12', '13:25:25', 'Satisfied and will use the same flight again', 3);
+INSERT INTO suggested VALUES ('testcustomer@nyu.edu', 104, '2021-05-14', '13:25:25', 'Customer Care services are not good', 1);
+INSERT INTO suggested VALUES ('user1@nyu.edu', 104, '2021-05-14', '13:25:25', '“Comfortable journey and Professional', 5);
