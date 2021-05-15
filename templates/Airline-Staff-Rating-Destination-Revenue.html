@@ -61,15 +61,16 @@
                 <td class="u-table-cell">Departure Time</td>
                 <td class="u-table-cell">Average Rating</td>
               </tr>
+              {% for line in avgRatings %}
               <tr style="height: 65px;">
-                {% for line in avgRatings %}
                 <td class="u-table-cell">{{line['AirlineName']}}</td>
                 <td class="u-table-cell">{{line['FlightNumber']}}</td>
                 <td class="u-table-cell">{{line['DepartureDate']}}</td>
                 <td class="u-table-cell">{{line['DepartureTime']}}</td>
                 <td class="u-table-cell">{{line['averageRating']}}</td>
-                {% endfor %}
+                
               </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>

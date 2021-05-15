@@ -12,7 +12,7 @@ app = Flask(__name__)
 conn = pymysql.connect(host='localhost',
                        user='root',
                        password='',
-                       db='5projecttest',
+                       db='6projecttest',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 
@@ -65,7 +65,7 @@ def registerAuth():
 	else:
 		#password = hashlib.md5(password.encode())
 		ins = 'INSERT INTO customer VALUES(%s, %s, md5(%s), %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-		cursor.execute(ins, (name, email, password, int(buildingNumber), street, city, state, int(phone), passportNumber,passportExp, passportCountry, dateOfBirth))
+		cursor.execute(ins, (name, email, password, int(buildingNumber), street, city, state, phone, passportNumber,passportExp, passportCountry, dateOfBirth))
 		conn.commit()
 		cursor.close()
 		return render_template('index.html')
@@ -330,6 +330,8 @@ def custPurchaseOneWayFlight():
 	checkFlightHasSeats = 'SELECT f.AirlineName, f.FlightNumber, f.DepartureDate, f.DepartureTime, f.BasePrice, f.ArrivalDate, f.ArrivalTime, f.ArrivalAirport, f.DepartureAirport, COUNT(ticketID) as booked, numberOfSeats FROM flight as f LEFT JOIN purchasedfor AS p ON p.FlightNumber = f.FlightNumber AND p.DepartureDate = f.DepartureDate AND p.DepartureTime = f.DepartureTime INNER JOIN updates AS u ON u.FlightNumber = f.FlightNumber AND u.DepartureDate = f.DepartureDate AND u.DepartureTime = f.DepartureTime INNER JOIN airplane ON f.AirplaneID = airplane.AirplaneID INNER JOIN airport AS a1 ON a1.AirportName = f.DepartureAirport INNER JOIN airport AS a2 ON a2.AirportName = f.ArrivalAirport WHERE f.FlightNumber NOT IN (SELECT FlightNumber from flight as f2 GROUP BY FlightNumber HAVING COUNT(f2.FlightNumber) > 1) AND f.DepartureDate = %s AND f.DepartureTime = %s AND f.FlightNumber = %s GROUP BY f.AirlineName, f.FlightNumber, f.DepartureDate, f.DepartureTime, ArrivalDate, FlightStatus HAVING booked < NumberOfSeats'
 	cursor.execute(checkFlightHasSeats, (dept_date, dept_time, flight_number))
 	data = cursor.fetchone()
+	print(request.form)
+	print(data)
 	airline, arrival_date, arrival_airport, dept_air, arr_time = data['AirlineName'], data['ArrivalDate'], data['ArrivalAirport'], data['DepartureAirport'], data['ArrivalTime']
 	totalBooked = data['booked']
 	totalSeats = data['numberOfSeats']

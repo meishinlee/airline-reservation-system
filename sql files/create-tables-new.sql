@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS Airplane(
     AirlineName varchar(50) NOT NULL, 
     AirplaneID int(10) NOT NULL, 
     NumberOfSeats int(5) NOT NULL,
-    PRIMARY KEY (AirlineName, AirplaneID)
+    PRIMARY KEY (AirlineName, AirplaneID),
+    FOREIGN KEY (AirlineName) REFERENCES Airline(AirlineName)
     );
 
 CREATE TABLE IF NOT EXISTS Flight(
