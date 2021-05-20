@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS Airline(
     AirlineName varchar(50),
     PRIMARY KEY (AirlineName)
-    );
+    ); 
 
 CREATE TABLE IF NOT EXISTS Airplane(
     AirlineName varchar(50) NOT NULL, 
